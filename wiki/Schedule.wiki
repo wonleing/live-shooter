@@ -1,0 +1,9 @@
+= Mile Stone 1 =
+
+||*Content*||*Owner*||*Finish time*||*Status*||
+||项目创建，wiki文档初始化，source code version control||Leon||2012/4/1||In progress||
+||Android app项目初始化||Zhu||  ||Not start||
+||Oauth协议及相关开发工具研究||Leon||2012/4/5||In progress||
+||视频采集功能及质量选择||Zhu||  ||Not start||
+||文字输入输出功能（描述，评论，回评）||Zhu||  ||Not start||
+||视频显示窗口缩放||Zhu||  ||Not start||
