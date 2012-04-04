@@ -1,8 +1,8 @@
 = Mile Stone 1 =
 
 ||*Content*||*Owner*||*Start time*||*Finish time*||*Status*||
-||项目创建，wiki文档初始化，source code version control|| ||Leon||2012/3/29||Done||
-||Oauth协议及相关开发工具研究|| ||Leon||2012/4/5||In progress||
+||项目创建，wiki文档初始化，source code version control||Leon|| ||2012/3/29||Done||
+||Oauth协议及相关开发工具研究||Leon|| ||2012/4/5||In progress||
 ||Android app项目初始化||Arashmen||2012/4/9||2012/4/11 ||Not start||
 ||视频采集功能及质量选择||Arashmen|| || ||Not start||
 ||文字输入输出功能（描述，评论，回评）||Arashmen|| ||  ||Not start||
