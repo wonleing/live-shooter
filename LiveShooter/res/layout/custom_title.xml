@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/Common_title_bar"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_header"
+    android:orientation="horizontal" >
+
+    <Button
+        android:id="@+id/Common_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
+        android:background="@drawable/back_btn_selector"
+        android:textColor="@android:color/white"
+        android:text="返回"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/Common_title"
+        style="@style/font_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center_vertical" />
+
+    <Button
+        android:id="@+id/Common_refresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="5dp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/refresh_btn_selector"
+        android:text="刷新"
+        android:visibility="gone" />
+    <ProgressBar 
+        android:visibility="gone"
+        android:id="@+id/title_progress"
+        android:layout_alignParentRight="true"
+        android:padding="8dip"
+        android:layout_centerVertical="true"
+        android:layout_width="40dip" 
+        android:layout_height="40dip"/>
+
+</RelativeLayout>
