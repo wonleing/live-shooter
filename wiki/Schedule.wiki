@@ -5,7 +5,8 @@
 ||Android app项目初始化||Arashmen||2012/4/9||2012/4/11||Done||
 ||Oauth module import||Arashmen||2012/4/12||2012/4/15||Done||
 ||视频完整录制，以及本地保存，调研以及实现||Arashmen||2012/4/16||2012/4/18||In progress||
-||视频录制，即时分割视频文件||Arashmen||2012/4/19||2012/4/28 ||Not start||
+||视频录制，即时分割视频文件||Arashmen||2012/4/19||2012/4/22 ||In progress||
+||视频录制，即时分割视频文件||Arashmen||2012/4/12||2012/4/30 ||Not start||
 ||视频文件时时上传至服务器||Arashmen||2012/4/28||2012/5/5 ||Not start||
 ||Helix server and producer research||Leon||2012/4/16|| ||In progress||
 ||Http live streaming research||Leon||2012/4/17|| ||In progress||
