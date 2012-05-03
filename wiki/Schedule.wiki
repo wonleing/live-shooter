@@ -6,11 +6,11 @@
 ||Oauth module import||Arashmen||2012/4/12||2012/4/15||Done||
 ||视频完整录制，以及本地保存，调研以及实现||Arashmen||2012/4/16||2012/4/18||Done||
 ||Http live streaming research in android client||Arashmen||2012/4/19||2012/4/22 ||Done||
-||视频录制，即时分割视频文件||Arashmen||2012/4/22||2012/4/30 ||In progress||
-||视频录制，即时分割视频文件||Arashmen||2012/4/30||2012/5/7  ||In progress & delay||
+||视频录制，即时分割视频文件||Arashmen||2012/4/22||2012/5/7  ||In progress & delay||
 ||视频文件时时上传至服务器||Arashmen||2012/5/7||2012/5/15 ||Not start||
 ||Helix server and producer setup trail||Leon||2012/4/16||2012/4/19||Done||
 ||Http live streaming docs research||Leon||2012/4/17||2012/4/20||Done||
 ||Make use of VLC (open source) codec covertion||Leon||2012/4/17||2012/4/20||Done||
 ||Linux stream server initialize||Leon||2012/4/17||2012/4/20||Done||
+||Design on c/s comm protocol||Leon & Arashmen||2012/5/2|| ||In progress||
 ||Setup test server and try playback with the http URL||Arashmen|| || ||Not start||
