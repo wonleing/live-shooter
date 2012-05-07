@@ -1,4 +1,5 @@
 #!/bin/bash
+[ ! -e segmenter ] && echo "Please run setup first and make sure segmenter is built" && exit 1
 [ $# != 2 ] && echo "Usage: $0 <video_name> <path_to_video_segments>" && exit 1
 [ -e "/tmp/$1.info" ] || ./midentify.sh $2 > /tmp/$1.info
 source /tmp/$1.info
