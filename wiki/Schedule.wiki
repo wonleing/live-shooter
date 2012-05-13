@@ -11,6 +11,7 @@
 ||Helix server and producer setup trail||Leon||2012/4/16||2012/4/19||Done||
 ||Http live streaming docs research||Leon||2012/4/17||2012/4/20||Done||
 ||Make use of VLC (open source) codec covertion||Leon||2012/4/17||2012/4/20||Done||
-||Linux stream server initialize||Leon||2012/4/17||2012/4/20||Done||
-||Design on c/s comm protocol||Leon & Arashmen||2012/5/2|| ||In progress||
-||Setup test server and try playback with the http URL||Arashmen|| || ||Not start||
+||Linux stream server initialize||Leon||2012/4/17||2012/5/4||Done||
+||Design and try c/s xmlrpc protocol||Leon & Arashmen||2012/5/2||2012/5/13||Done||
+||Setup test server and try playback with the http URL||Arashmen||2012/5/2||2012/5/4||Done||
+||XMLRPC server apis||Leon||2012/5/13|| ||In progress||
