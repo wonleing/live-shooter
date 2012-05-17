@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
-import os, sys, random, optparse
+import os, sys, random, optparse, logging
 
 u = """%prog -s <server_ip>"""
 parser = optparse.OptionParser(u)
@@ -11,13 +11,22 @@ if options.serverip == None:
     parser.print_help()
     sys.exit()
 
-print "Starting service on ", options.serverip
+print "Starting service on", options.serverip
 server = SimpleXMLRPCServer((options.serverip, 8000))
 server.register_introspection_functions()
 
+logfile = "/var/log/liveshooter.log"
+logger = logging.getLogger('Live shooter')
+hdlr = logging.FileHandler(logfile)
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+hdlr.setFormatter(formatter)
+logger.addHandler(hdlr)
+logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
+
 class StreamServer:
     def __init__(self):
-        self.uploadpath = "/var/www/uploads/"
+        self.uploadpath = "/var/ftp/uploads/"
         
     def genFilename(self):
         rand = self._rand()
@@ -27,11 +36,12 @@ class StreamServer:
 
     def genSegment(self, filename, segmentname):
         #TBD, move createbroadcast.sh logic here
-        try:
-            os.system("./createbroadcast.sh %s %s" % (filename, self.uploadpath+segmentname))
-        except:
+        logger.debug("./createbroadcast.sh %s %s >> %s 2>&1" % (filename, self.uploadpath+segmentname, logfile))
+        ret = os.system("./createbroadcast.sh %s %s >> %s 2>&1" % (filename, self.uploadpath+segmentname, logfile))
+        if ret == 0:
+            return True
+        else:
             return False
-        return True
 
     def _rand(self):
         return "".join(random.sample('zyxwvutsrqponmlkjihgfedcba',8))
