@@ -1,25 +1,42 @@
 #!/usr/bin/python
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+import os, sys, random, optparse
 
+u = """%prog -s <server_ip>"""
+parser = optparse.OptionParser(u)
+parser.add_option('-s', '--server', help='stream server ip addres', dest='serverip')
+(options, leftargs) = parser.parse_args()
+if options.serverip == None:
+    parser.print_help()
+    sys.exit()
 
-class RequestHandler(SimpleXMLRPCRequestHandler):
-    rpc_paths = ('/RPC2',)
-
-
-server = SimpleXMLRPCServer(("localhost", 8000), requestHandler=RequestHandler)
+print "Starting service on ", options.serverip
+server = SimpleXMLRPCServer((options.serverip, 8000))
 server.register_introspection_functions()
-server.register_function(pow)
 
-def adder_function(x,y):
-    return x + y
-server.register_function(adder_function, 'add')
+class StreamServer:
+    def __init__(self):
+        self.uploadpath = "/var/www/uploads/"
+        
+    def genFilename(self):
+        rand = self._rand()
+        if os.path.exists(self.uploadpath + rand):
+            self.genFilename()
+        return rand
 
-class MyFuncs:
-    def div(self, x, y):
-        return x // y
+    def genSegment(self, filename, segmentname):
+        #TBD, move createbroadcast.sh logic here
+        try:
+            os.system("./createbroadcast.sh %s %s" % (filename, self.uploadpath+segmentname))
+        except:
+            return False
+        return True
 
-server.register_instance(MyFuncs())
+    def _rand(self):
+        return "".join(random.sample('zyxwvutsrqponmlkjihgfedcba',8))
+
+server.register_instance(StreamServer())
 
 # Run the server's main loop
 server.serve_forever()
