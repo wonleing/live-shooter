@@ -10,8 +10,6 @@
 ||服务器视频下行到客户端播放Demo||Arashmen||2012/5/15||2012/5/20  ||Done||
 ||视频文件时时上传至服务器||Arashmen||2012/5/20||2012/6/11 ||In progress||
 ||模块初步整合||Arashmen||2012/6/11||2012/6/15 ||In progress||
-
-
 ||Helix server and producer setup trail||Leon||2012/4/16||2012/4/19||Done||
 ||Http live streaming docs research||Leon||2012/4/17||2012/4/20||Done||
 ||Make use of VLC (open source) codec covertion||Leon||2012/4/17||2012/4/20||Done||
