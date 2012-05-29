@@ -18,4 +18,4 @@
 ||Linux stream server initialize||Leon||2012/4/17||2012/5/4||Done||
 ||Design and try c/s xmlrpc protocol||Leon & Arashmen||2012/5/2||2012/5/13||Done||
 ||Setup test server and try playback with the http URL||Arashmen||2012/5/2||2012/5/4||Done||
-||XMLRPC server apis||Leon||2012/5/13|| ||In progress||
+||XMLRPC server apis||Leon||2012/5/13|| ||Not start||
