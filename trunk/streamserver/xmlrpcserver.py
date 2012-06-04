@@ -26,7 +26,7 @@ logger.setLevel(logging.DEBUG)
 
 class StreamServer:
     def __init__(self):
-        self.uploadpath = "/var/ftp/uploads/"
+        self.uploadpath = "/var/ftp/pub/"
         
     def genFilename(self):
         rand = self._rand()
@@ -34,10 +34,10 @@ class StreamServer:
             self.genFilename()
         return rand
 
-    def genSegment(self, filename, segmentname):
+    def genSegment(self, filename):
         #TBD, move createbroadcast.sh logic here
-        logger.debug("./createbroadcast.sh %s %s >> %s 2>&1" % (filename, self.uploadpath+segmentname, logfile))
-        ret = os.system("./createbroadcast.sh %s %s >> %s 2>&1" % (filename, self.uploadpath+segmentname, logfile))
+        logger.debug("./createbroadcast.sh %s %s>> %s 2>&1" % (filename, options.serverip, logfile))
+        ret = os.system("./createbroadcast.sh %s %s>> %s 2>&1" % (filename, options.serverip, logfile))
         if ret == 0:
             return True
         else:
