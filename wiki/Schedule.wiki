@@ -15,6 +15,6 @@
 ||Make use of VLC (open source) codec covertion||Leon||2012/4/17||2012/4/20||Done||
 ||Linux stream server initialize||Leon||2012/4/17||2012/5/4||Done||
 ||Design and try c/s xmlrpc protocol||Leon & Arashmen||2012/5/2||2012/5/13||Done||
-||Setup test server and try playback with the http URL||Arashmen||2012/5/2||2012/5/4||Done||
-||basic XMLRPC server apis||Leon||2012/5/13||2012/6/2||Done||
+||Basic XMLRPC server apis||Leon||2012/5/13||2012/6/2||Done||
+||Setup test server to integration test with server api and java client||Leon & Arashmen||2012/5/2||2012/6/2||Done||
 ||SIP solution research||Leon||2012/5/30|| ||In progress||
