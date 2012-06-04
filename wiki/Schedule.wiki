@@ -1,7 +1,7 @@
 = Mile Stone 1 =
 
 ||*Content*||*Owner*||*Start time*||*Finish time*||*Status*||
-||项目创建，wiki文档初始化，source code version control||Leon|| ||2012/3/29||Done||
+||项目创建，wiki文档初始化，source code version control||Leon||2012/3/29||2012/3/29||Done||
 ||Android app项目初始化||Arashmen||2012/4/9||2012/4/11||Done||
 ||Oauth module import||Arashmen||2012/4/12||2012/4/15||Done||
 ||视频完整录制，以及本地保存，调研以及实现||Arashmen||2012/4/16||2012/4/18||Done||
@@ -16,4 +16,5 @@
 ||Linux stream server initialize||Leon||2012/4/17||2012/5/4||Done||
 ||Design and try c/s xmlrpc protocol||Leon & Arashmen||2012/5/2||2012/5/13||Done||
 ||Setup test server and try playback with the http URL||Arashmen||2012/5/2||2012/5/4||Done||
-||XMLRPC server apis||Leon||2012/5/13|| ||Not start||
+||basic XMLRPC server apis||Leon||2012/5/13||2012/6/2||Done||
+||SIP solution research||Leon||2012/5/30|| ||In progress||
