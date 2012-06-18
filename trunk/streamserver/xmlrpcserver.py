@@ -26,11 +26,9 @@ formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
 logger.setLevel(logging.DEBUG)
-logger.setLevel(logging.INFO)
-logger.setLevel(logging.ERROR)
 
 class StreamServer:
-    def _check(self, cmd)
+    def _check(self, cmd):
         if not os.path.exists(cmd):
             logger.error("Critical: %s is not installed" % cmd)
             sys.exit()
@@ -43,7 +41,9 @@ class StreamServer:
         self._check("/usr/bin/vlc")
         rand = self._rand()
         if os.path.exists(uploadpath + rand):
+            logger.info("random filename already existed, genFilename again!")
             self.genFilename()
+        logger.debug("genFilename returns ==%s== as the file name" % rand)
         return rand
 
     def genSegment(self, filename, videotitle):
@@ -51,21 +51,22 @@ class StreamServer:
         outfile = httpdir + filename + "_1.ts" 
         os.system("sudo chmod a+r %s" % infile)
         self.videoinfo = {}
-        for l in os.popen("mplayer -vo null -ao null -frames 0 -identify %s 2>/dev/null | grep ^ID_" % infile).readlines()
-            videoinfo[l.split("=")[0]] = l.split("=")[1][:-1]
+        for l in os.popen("mplayer -vo null -ao null -frames 0 -identify %s 2>/dev/null | grep ^ID_" % infile).readlines():
+            self.videoinfo[l.split("=")[0]] = l.split("=")[1][:-1]
         if not self._videoconvert(self.videoinfo, infile, outfile):
             return False
 
         logger.debug("vlc trancode for %s completed" % infile)
         m = open(httpdir+filename+".m3u8", "w")
-        m.write("#EXTM3U\n#EXT-X-TARGETDURATION:%s\n#EXTINF:%s,\n%s%s_1.ts"
-               % (segmentlength, segmentlength, exportdir, filname))
+        m.write("#EXTM3U\n#EXT-X-TARGETDURATION:%s\n#EXTINF:%s,\n%s%s_1.ts\n#EXT-X-ENDLIST"
+               % (segmentlength, segmentlength, exportdir, filename))
         m.close()
         t = open("template.html", "r")
         n = open(httpdir+filename+".html", "w")
-        n.write(t.read().replace("FileName", filename).replace("VideoTitle", "videotitle"))
+        n.write(t.read().replace("FileName", filename).replace("VideoTitle", videotitle))
         t.close()
         n.close()
+        logger.debug("M3U8 file and html page for %s created" %filename) 
         return True
 
     def updateSegment(self, filename, seq):
@@ -79,19 +80,24 @@ class StreamServer:
 
         logger.debug("vlc trancode for %s completed" % infile)
         om = open(m3file, "r")
-        nm = open(m3tmp,"w")
+        nm = open(m3tmp, "w")
         oc = om.readlines()
         om.close()
         if len(oc) > 10:
             oc = oc[:2] + oc[4:]
-        nc = oc[:-1] + ['#EXTINF:%s' % segmentlength,'%s%s_%s.ts' % (exportdir, filname, seq)] + oc[-1]
-        nm.write(nc)
+        logger.debug("old M3U8 content is %s", "".join(oc))
+        nc = oc[:-1] + ['#EXTINF:%s,\n' % segmentlength,'%s%s_%s.ts\n' % (exportdir, filename, seq)] + [oc[-1]]
+        logger.debug("new M3U8 content is %s", "".join(nc))
+        nm.write("".join(nc))
         nm.close()
         os.system("mv %s %s" %(m3tmp, m3file))
+        logger.debug("M3U8 file for %s updated" %filename) 
+        return True
 
-    def _videocovert(self, videoinfo, infile, outfile):
+    def _videoconvert(self, videoinfo, infile, outfile):
         try:
-            os.system('vlc -I dummy --sout
+            logger.debug("Start video convert from %s to %s" %(infile, outfile))
+            os.system('vlc -I dummy --sout \
             "#transcode{width=%s,height=%s,vcodec=h264,vb=%d,acodec=mp4a,ab=%d}:std{mux=ts,dst=%s,access=file}" %s vlc://quit'
             % (videoinfo['ID_VIDEO_WIDTH'],
                videoinfo['ID_VIDEO_HEIGHT'],
@@ -107,11 +113,14 @@ class StreamServer:
     def finishRecord(self, filename, oauth=None):
         if oauth:
             #TBD, join all mp4 or ts file segments and upload to oauth desination
+            logger.debug("video uploaded to oauth web site")
         else:
             time.sleep(30)
         # Delete original upload mp4 files?
         os.system("rm -rf %s*.mp4" % (uploadpath+filename))
         os.system("rm -rf %s*" %(httpdir+filename))
+        logger.info("live video segments of %s completely deleted" %filename)
+        return True
 
 
 server.register_instance(StreamServer())
