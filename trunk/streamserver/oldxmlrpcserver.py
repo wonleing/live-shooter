@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
-import os, sys, random, optparse, logging, time, thread
+import os, sys, random, optparse, logging, time
 
 u = """%prog -s <server_ip>"""
 parser = optparse.OptionParser(u)
@@ -16,7 +16,6 @@ server = SimpleXMLRPCServer((options.serverip, 8000))
 server.register_introspection_functions()
 
 segmentlength = 5
-videoinfo = {'width':352, 'hight':288, 'vbit':300, 'abit':64}
 uploadpath = "/var/ftp/pub/"
 httpdir = "/var/www/live-shooter/"
 exportdir = "http://" + options.serverip + "/live-shooter/"
@@ -38,6 +37,7 @@ class StreamServer:
         return "".join(random.sample('zyxwvutsrqponmlkjihgfedcba',8))
 
     def genFilename(self):
+        self._check("/usr/bin/mplayer")
         self._check("/usr/bin/vlc")
         rand = self._rand()
         if os.path.exists(uploadpath + rand):
@@ -48,64 +48,66 @@ class StreamServer:
 
     def genSegment(self, filename, videotitle):
         infile = uploadpath + filename + ".mp4"
-        logger.debug("Starting to handle incoming video %s" %infile)
-        os.system("sudo chmod 666 %s" % infile)
-        self._createHtml(filename, videotitle)
-        seq = 1
-        while os.path.getsize(infile):
-            f = open(infile,"rb")
-            content = f.read()
-            f.close()
-            f = open(infile,"w")
-            f.write("")
-            f.close()
-            tmpseg = uploadpath + filename + "_" + str(seq) + ".mp4"
-            nf = open(tmpseg,"wb")
-            nf.write(content)
-            nf.close()
-            logger.debug("%s is splited out from the video stream" % tmpseg)
-            outfile = httpdir + filename + "_" + str(seq) + ".ts" 
-            thread.start_new_thread(self._videoconvert, (tmpseg, outfile))
-            self._writeIndex(filename, str(seq))
-            seq += 1
-            time.sleep(5)
-        return True
+        outfile = httpdir + filename + "_1.ts" 
+        os.system("sudo chmod a+r %s" % infile)
+        self.videoinfo = {}
+        for l in os.popen("mplayer -vo null -ao null -frames 0 -identify %s 2>/dev/null | grep ^ID_" % infile).readlines():
+            self.videoinfo[l.split("=")[0]] = l.split("=")[1][:-1]
+        if not self._videoconvert(self.videoinfo, infile, outfile):
+            return False
 
-    def _writeIndex(self, filename, seq):
-        m3file = httpdir + filename + ".m3u8"
-        m3tmp = "/tmp/" + filename + ".m3u8"
-        if not os.path.exists(m3file):
-            logger.debug("creating m3u8 index %s" % m3file)
-            m = open(m3file, "w")
-            m.write("#EXTM3U\n#EXT-X-TARGETDURATION:%s\n#EXT-X-ENDLIST" % segmentlength)
-            m.close()
-        logger.debug("update m3u8 index for %s_%s" % (filename, seq))
-        m = open(m3file, "r")
-        oc = m.readlines()
+        logger.debug("vlc trancode for %s completed" % infile)
+        m = open(httpdir+filename+".m3u8", "w")
+        m.write("#EXTM3U\n#EXT-X-TARGETDURATION:%s\n#EXTINF:%s,\n%s%s_1.ts\n#EXT-X-ENDLIST"
+               % (segmentlength, segmentlength, exportdir, filename))
         m.close()
-        if len(oc) > 10:
-            logger.debug("deleteing old ts entries")
-            oc = oc[:2] + oc[4:]
-        nc = oc[:-1] + ['#EXTINF:%s,\n' % segmentlength,'%s%s_%s.ts\n' % (exportdir, filename, seq)] + [oc[-1]]
-        logger.debug("new M3U8 content is %s", "".join(nc))
-        m = open(m3file, "w")
-        m.write("".join(nc))
-        m.close()
-
-    def _createHtml(self, filename, videotitle):
         t = open("template.html", "r")
         n = open(httpdir+filename+".html", "w")
         n.write(t.read().replace("FileName", filename).replace("VideoTitle", videotitle))
         t.close()
         n.close()
-        logger.debug("html page for %s created. Title is %s" %(filename, videotitle))
+        logger.debug("M3U8 file and html page for %s created" %filename) 
+        return True
 
-    def _videoconvert(self, infile, outfile):
+    def updateSegment(self, filename, seq):
+        infile = uploadpath + filename + "_" + seq + ".mp4"
+        outfile = httpdir + filename + "_" + seq + ".ts"
+        m3file = httpdir + filename + ".m3u8"
+        m3tmp = "/tmp/" + filename + ".m3u8"
+        os.system("sudo chmod a+r %s" % infile)
+        if not self._videoconvert(self.videoinfo, infile, outfile):
+            return False
+
+        logger.debug("vlc trancode for %s completed" % infile)
+        om = open(m3file, "r")
+        nm = open(m3tmp, "w")
+        oc = om.readlines()
+        om.close()
+        if len(oc) > 10:
+            oc = oc[:2] + oc[4:]
+        logger.debug("old M3U8 content is %s", "".join(oc))
+        nc = oc[:-1] + ['#EXTINF:%s,\n' % segmentlength,'%s%s_%s.ts\n' % (exportdir, filename, seq)] + [oc[-1]]
+        logger.debug("new M3U8 content is %s", "".join(nc))
+        nm.write("".join(nc))
+        nm.close()
+        os.system("mv %s %s" %(m3tmp, m3file))
+        logger.debug("M3U8 file for %s updated" %filename) 
+        return True
+
+    def _videoconvert(self, videoinfo, infile, outfile):
         try:
             logger.debug("Start video convert from %s to %s" %(infile, outfile))
+            logger.debug("video info is %s" %str(videoinfo))
             os.system('vlc -I dummy --sout \
-            "#transcode{width=%d,height=%d,vcodec=h264,vb=%d,acodec=mp4a,ab=%d}:std{mux=ts,dst=%s,access=file}" %s vlc://quit'
-            % (videoinfo['width'], videoinfo['hight'], videoinfo['vbit'], videoinfo['abit'], outfile, infile))
+            "#transcode{width=%s,height=%s,vcodec=h264,vb=%d,acodec=mp4a,ab=%d}:std{mux=ts,dst=%s,access=file}" %s vlc://quit'
+            % (videoinfo['ID_VIDEO_WIDTH'],
+               videoinfo['ID_VIDEO_HEIGHT'],
+               #int(videoinfo['ID_VIDEO_BITRATE'])/1024,
+               300,
+               #int(videoinfo['ID_AUDIO_BITRATE'])/1024,
+               92,
+               outfile,
+               infile))
             return True
         except:
             logger.error("vlc transcode failed on %s" % infile)
