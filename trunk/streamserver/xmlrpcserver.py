@@ -113,7 +113,7 @@ class StreamServer:
 
     def finishRecord(self, filename, oauth=None):
         if oauth:
-            #TBD, join all mp4 or ts file segments and upload to oauth desination
+            #TBD, join all mp4 or ts file segments and upload to oauth destination
             logger.debug("video uploaded to oauth web site")
         else:
             time.sleep(30)
@@ -124,7 +124,6 @@ class StreamServer:
         return True
 
 
-server.register_instance(StreamServer())
-
 # Run the server's main loop
+server.register_instance(StreamServer())
 server.serve_forever()
