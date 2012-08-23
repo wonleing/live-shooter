@@ -1,4 +1,4 @@
-# Contact list (keep updateing)
+#summary Contact list (keep updateing)
 = Contact list =
 
 ||*Name*||*Mobile*||*Google account*||*Mail*||
@@ -16,9 +16,9 @@ lz376575887@163.com;
 woshi13596665438@163.com;
 warshiel@foxmail.com;
 luodailong@163.com;
+lettingo@live.cn;
 
 == TBC temp list ==
 
 wangsai_chao@126.com;
 598064650@qq.com;
-lettingo@live.cn;
