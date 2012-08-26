@@ -1,10 +1,10 @@
 #summary Contact list (keep updateing)
 = Contact list =
 
-||*Name*||*Mobile*||*Google account*||*Mail*||
-||Leon||13810776712||wonleing@gmail.com||wonleing@163.com||
-||Arashmen||18600545192||arashmenzhu@gmail.com||arashmen@163.com||
-||Duquanlong||15724706357||duquanglong@gmail.com||duquanglong_123@126.com||
+||*Name*||*Mobile*||*Google account*||*Mail*||*QQ*||
+||Leon||13810776712||wonleing@gmail.com||wonleing@163.com||26240726||
+||Arashmen||18600545192||arashmenzhu@gmail.com||arashmen@163.com||173764546||
+||Duquanlong||15724706357||duquanglong@gmail.com||duquanglong_123@126.com||839614924||
 
 = Quick Mail list =
 
