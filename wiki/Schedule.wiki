@@ -23,3 +23,4 @@
 ||User interface design and framework implement|| || || ||Waiting for owner||
 ||Post video link to SNS and retrieve comments back|| || || ||Waiting for owner||
 ||Write docs about server setup and debug env|| || || ||Waiting for owner||
+||Co-work with client debug(socket/xmlrpc apis)||Leon|| || ||Not start||
