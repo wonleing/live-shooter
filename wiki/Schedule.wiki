@@ -19,3 +19,7 @@
 ||Setup test server to integration test with server api and java client||Leon & Arashmen||2012/5/2||2012/6/2||Done||
 ||SIP solution research||Leon||2012/5/30||2012/6/16||Done||
 ||updateSegment and finishRecord apis||Leon||2012/6/16||2012/6/18||Done||
+||Try new socket transfer mode|| || || ||Waiting for owner||
+||User interface design and framework implement|| || || ||Waiting for owner||
+||Post video link to SNS and retrieve comments back|| || || ||Waiting for owner||
+||Write docs about server setup and debug env|| || || ||Waiting for owner||
