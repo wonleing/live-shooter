@@ -140,7 +140,7 @@ public class LiveShooterService {
 					out.write(h264pps);
 					execute2(fis);
 				} catch (Exception e) {
-					Log.i("exception", e.getMessage());
+					Log.e("exception", e.getMessage());
 				}
 			}
 		}.start();
