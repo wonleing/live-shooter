@@ -1,14 +1,15 @@
 package com.android.liveshooter.activity;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
+import java.net.Socket;
 import java.util.Vector;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.xmlrpc.XmlRpcClient;
-import org.apache.xmlrpc.XmlRpcException;
 import android.media.MediaRecorder;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
@@ -17,9 +18,9 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 public class LiveShooterService {
-
-	public static final String IPaddr = "192.168.43.54";
-	public static final String XMLRPCport = "8000";
+	public static final String IPaddr = "192.168.188.2";
+	public static final int XMLRPCport = 8000;
+	public static final int Socketport = 8001;
 	public static final String Httpdir = "/live-shooter";
 	public static final String FTPdir = "";
 	public static final String FTPport = "21";
@@ -35,6 +36,7 @@ public class LiveShooterService {
 	private String SegmentName;
 	private InputStream fis;
 	private OutputStream out;
+	private boolean flag;
 	
 	public LiveShooterService(SurfaceHolder holder) throws Exception{
 		this.holder = holder;
@@ -59,7 +61,7 @@ public class LiveShooterService {
 		mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 		mMediaRecorder.setVideoFrameRate(30);
 		mMediaRecorder.setVideoSize(352, 288);
-		mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H263);
+		mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
 		mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
 		mMediaRecorder.setPreviewDisplay(holder.getSurface());
 		mMediaRecorder.setMaxDuration(500000000);
@@ -122,14 +124,8 @@ public class LiveShooterService {
 				// 读取最前面的32个自己的空头
 				try {
 					dis.read(buffer, 0, 32);
-				} catch (IOException e1) {
-
-					e1.printStackTrace();
-				}
-				try {
 					out = sender.getOutputStream();
 				} catch (IOException e2) {
-
 					e2.printStackTrace();
 				}
 				// 这些参数要对应我现在的视频设置，如果想变化的话需要去重新确定，
@@ -142,39 +138,60 @@ public class LiveShooterService {
 					out.write(h264sps);
 					out.write(h264head);
 					out.write(h264pps);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-				try {
-					genSegment(fis);
+					execute2(fis);
 				} catch (Exception e) {
 					Log.i("exception", e.getMessage());
 				}
 			}
 		}.start();
 	}
+	
+	private void execute2(InputStream in) throws Exception {
+//		FileInputStream fileInput = new FileInputStream(new File("/mnt/sdcard/Arashmen/Bad Aibling.rar"));
+		Log.i("msg","socket start...");
+		Socket s = new Socket(IPaddr, Socketport);
+		s.setKeepAlive(true);
+		OutputStream netout = s.getOutputStream();
+		OutputStream out = new DataOutputStream(new BufferedOutputStream(netout));
+		Log.i("msg","out....");
+		while(!flag){
+			byte[] buff = new byte[in.available()];
+			int num = in.read(buff);
+			Log.i("msg", "num = " + num);
+			if(num!=-1){
+				out.write(buff);
+			}else{
+				flag = true;
+			}
+			Thread.sleep(100);
+			Log.i("msg","success ");
+		}
+		out.flush();
+		out.close();
+		in.close();
+		s.close();
+	}
 
-	private void genSegment(InputStream in) throws Exception {
+	private void execute(InputStream in) throws Exception {
 		XmlRpcClient client = new XmlRpcClient(serverUrl + ":8000/");
 		Vector<Object> params = new Vector<Object>();
 		SegmentName = client.execute("genFilename", params).toString();
 		String urlStr = serverUrl + "/live-shooter/" + SegmentName + ".html";
 		Log.i("msg", "urlStr = " + urlStr);
-		boolean isSuccess = uploadFile(IPaddr, FTPport, FTPuser, FTPpass, FTPdir, SegmentName + SegmentExt, in);
-		Log.i("msg", "isSuccess = " + isSuccess);
 		Vector<Object> paramsDemo = new Vector<Object>();
 		paramsDemo.addElement(SegmentName);
 		paramsDemo.add("Live Shooter");
 		String finalResult = client.execute("genSegment", paramsDemo).toString();
-		Log.i("msg", "finalResult = "+ finalResult);
-	}
-	
-	private void finishSegment()throws Exception{
-		XmlRpcClient client = new XmlRpcClient(serverUrl + ":8000/");
-		Vector<Object> paramsDemo = new Vector<Object>();
-		paramsDemo.addElement(SegmentName);
-		String finalResult = client.execute("finishRecord", paramsDemo).toString();
-		Log.i("msg", "finishRecord = "+ finalResult);
+		boolean isSuccess = uploadFile(IPaddr, FTPport, FTPuser, FTPpass, FTPdir, SegmentName + SegmentExt, in);
+		int count = 0;
+		while(!flag){
+			Thread.sleep(5000);
+			count ++;
+			paramsDemo.addElement(SegmentName);
+			paramsDemo.addElement(""+count);
+			String finalResult1 = client.execute("updateSegment", paramsDemo).toString();
+			boolean isSuccess1 = uploadFile(IPaddr, FTPport, FTPuser, FTPpass, FTPdir, SegmentName + SegmentExt, in);
+		}
 	}
 	
 	public boolean uploadFile(String url, String port, String username, String password, String path, String filename, InputStream input) {
@@ -191,29 +208,6 @@ public class LiveShooterService {
 			}
 			ftp.changeWorkingDirectory(path);
 			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
-			new Thread(){
-				public void run() {
-					try {
-						XmlRpcClient client = new XmlRpcClient(serverUrl + ":8000/");
-						Vector<Object> paramsDemo = new Vector<Object>();
-						paramsDemo.addElement(SegmentName);
-						Log.i("msg", "SegmentName = "+ SegmentName);
-						paramsDemo.add("Live Shooter");
-						Log.i("msg", "genSegment Start");
-						String finalResult = client.execute("genSegment", paramsDemo).toString();
-						Log.i("msg", "finalResult = "+ finalResult);
-					} catch (MalformedURLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (XmlRpcException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				};
-			}.start();
 			ftp.storeFile(filename, input);
 			input.close();
 			ftp.logout();
@@ -232,6 +226,7 @@ public class LiveShooterService {
     }
 	
 	public void shutdownInput() throws IOException{
+		flag = true;
 		receiver.shutdownInput();
 		releaseMediaRecorder();
 		lss.close();
@@ -240,16 +235,13 @@ public class LiveShooterService {
 		sender = null;
 		receiver.close();
 		receiver = null;
-		new Thread(){
-			@Override
-			public void run() {
-				super.run();
-				try {
-					finishSegment();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}.start();
+	}
+	
+	private void finishSegment()throws Exception{
+		XmlRpcClient client = new XmlRpcClient(serverUrl + ":8000/");
+		Vector<Object> paramsDemo = new Vector<Object>();
+		paramsDemo.addElement(SegmentName);
+		String finalResult = client.execute("finishRecord", paramsDemo).toString();
+		Log.i("msg", "finishRecord = "+ finalResult);
 	}
 }
