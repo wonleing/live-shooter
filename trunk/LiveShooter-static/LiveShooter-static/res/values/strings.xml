@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Live Shooter</string>
+    <string name="network_unavailable">没有可用的网络！</string>
+    
+    <!-- String for dialog , author : Arashmen     Start -->
+
+    <string name="dialog_sure">确定</string>
+    <string name="dialog_exit">退出</string>
+    <string name="dialog_cancel">取消</string>
+    <string name="dialog_point">提示</string>
+    <string name="dialog_make_sure_to_exit">确定退出客户端?</string>
+    <string name="dialog_new_version_to_update">检测到最新版本，确定进行更新？</string>
+    <string name="dialog_network_unavailable">网络不可用！</string>
+    <string name="dialog_network_setting">设置</string>
+    
+    
+    
+    <!-- String 最新Weibo-->
+    <string name="check_comment">查看评论(%1$s)</string>   
+    <string name="from">%1$s前来自</string>
+    
+
+    <!-- String for title & direction , author : Arashmen     Start -->
+
+    <string name="common_0">最新</string>
+    <string name="common_1">收藏</string>
+    <string name="common_2">关于</string>
+    <string name="common_3">我的设置</string>
+
+    <!-- String for title & direction , author : Arashmen     End -->
+
+
+    <!-- String for ImageView contentDescription , author : Arashmen     Start -->
+
+    <string name="common_string_tab_0">First Tab</string>
+    <string name="common_string_tab_1">Second Tab</string>
+    <string name="common_string_tab_2">Thrid Tab</string>
+    <string name="common_string_tab_3">Fourth Tab</string>
+    <string name="common_string_for_imageview">Common</string>
+    
+    
+    <string name="common_sina_blog">新浪微博</string>
+	<string name="common_tencent_blog">腾讯微博</string>
+	<string name="common_sohu_blog">搜狐微博</string>
+	<string name="common_wangyi_blog">网易微博</string>
+	
+    <!-- String forImageView contentDescription  , author : Arashmen     End -->
+    <string name="no_available_network">没有可用的网络！</string>
+
+    <string name="save_image">保存图片%1$s</string>
+    <string name="send_sina">转发至新浪微博</string>
+    <string name="send_qq">转发至腾讯微博</string>
+    <string name="send_163">转发至网易微博</string>
+    
+	
+	<!-- TransferActivity start -->
+	<string name="transfer_title">快速转发</string>
+	<string name="tranfer_return">返回</string>
+	<string name="tranfer_trans">转发</string>    
+	<string name="transfer_content">转发内容......</string>
+	<string name="transfer_last">还可输入</string>
+	<string name="transfer_word">字</string>
+	<string name="transfer_140">140</string>
+	<string name="transfer_bind_later">稍后再说</string>
+	<string name="transfer_bind">绑定账号</string>
+    <string name="transfer_auth">您还未绑定该平台账户，是否现在去绑定？</string>
+	<string name="transfer_to">转发至社交网站</string>
+	
+	<!-- TransferActivity end -->
+	
+	
+</resources>
