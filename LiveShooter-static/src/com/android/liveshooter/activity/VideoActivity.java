@@ -39,13 +39,17 @@ public class VideoActivity extends Activity implements  SurfaceHolder.Callback{
 		});
         btn_stop.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				try {
-					service.shutdownInput();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+					try {
+						service.shutdownInput();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					android.os.Process.killProcess(android.os.Process.myPid()) ;
 			}
 		});
+        
+        
     }  
     
     @Override  
