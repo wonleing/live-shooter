@@ -1,27 +1,36 @@
-import os, random, socket
-address = ('192.168.188.2', 8001)
-BUFSIZ = 8196
-mux = ".mp4"
-tcpSerSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-tcpSerSock.bind(address)
-tcpSerSock.listen(999)
+import asyncore, socket, random
+address = ("192.168.188.2", 8001)
+BUFSIZE = 8196
 
-print 'Server started, waiting for connection...'
-while True:
-    tcpCliSock, addr = tcpSerSock.accept()
-    print 'Got connection from:', addr
-    newname = "".join(random.sample('zyxwvutsrqponmlkjihgfedcba',8))
-    print 'Generated new file:', newname
-    f = open(newname+mux, "a")
-    while True: 
-        try:  
-            tcpCliSock.settimeout(5)
-            data = tcpCliSock.recv(BUFSIZ)
-            if not data:
-                break
-            f.write(data)
-        except socket.timeout:
-            print 'connection from %s time out' % addr
-    f.close()
-    tcpCliSock.close()
-tcpSerSock.close()
+class Host(asyncore.dispatcher):
+    def __init__(self, address):
+        asyncore.dispatcher.__init__(self)
+        self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.bind(address)
+        self.set_reuse_addr()
+        self.listen(5)
+
+    def handle_accept(self):
+        pair = self.accept()
+        if pair is not None:
+            sock, addr = pair
+            newname = "".join(random.sample('zyxwvutsrqponmlkjihgfedcba',8))
+            print 'data from %s is written into %s' % (repr(addr), newname)
+            WriteHandler(sock, newname)
+
+class WriteHandler(asyncore.dispatcher_with_send):
+    def __init__(self, sock, file):
+        asyncore.dispatcher_with_send.__init__(self, sock)
+        self.f = open(file, "a")
+
+    def handle_read(self):
+        data = self.recv(BUFSIZE)
+        if data:
+            self.f.write(data)
+            print "received: " + str(len(data))
+
+    def handle_close(self):
+        self.f.close()
+
+server = Host(address)
+asyncore.loop()
