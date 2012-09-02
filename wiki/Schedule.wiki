@@ -20,7 +20,9 @@
 ||SIP solution research||Leon||2012/5/30||2012/6/16||Done||
 ||updateSegment and finishRecord apis||Leon||2012/6/16||2012/6/18||Done||
 ||Try new socket transfer mode|| || || ||Waiting for owner||
-||User interface design and framework implement||Duquanlong || || ||Not start||
+||User interface design and framework implement|| || || ||Waiting for owner||
 ||Post video link to SNS and retrieve comments back|| || || ||Waiting for owner||
 ||Write docs about server setup and debug env|| || || ||Waiting for owner||
-||Co-work with client debug(socket/xmlrpc apis)||Leon|| || ||Not start||
+||socket multiple thread server, multiple thread client samples||Leon||2012/8/20||2012/8/31||Done||
+||debug client stream video send to server, h264 problem||Leon||2012/8/27|| ||In progress||
+||vlc stream video to http live streaming||Leon||2012/8/31|| ||In progress||
