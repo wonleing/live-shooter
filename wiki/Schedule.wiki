@@ -20,7 +20,7 @@
 ||SIP solution research||Leon||2012/5/30||2012/6/16||Done||
 ||updateSegment and finishRecord apis||Leon||2012/6/16||2012/6/18||Done||
 ||Try new socket transfer mode|| || || ||Waiting for owner||
-||User interface design and framework implement|| || || ||Waiting for owner||
+||User interface design and framework implement||Duquanlong || || ||Not start||
 ||Post video link to SNS and retrieve comments back|| || || ||Waiting for owner||
 ||Write docs about server setup and debug env|| || || ||Waiting for owner||
 ||Co-work with client debug(socket/xmlrpc apis)||Leon|| || ||Not start||
