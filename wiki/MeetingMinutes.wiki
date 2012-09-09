@@ -20,3 +20,14 @@
   # Auth协议，自己参考新浪微薄的auth认证，然后自己写出来
   # UI设计，适配不要用绝对坐标，一定要用自适应布局
   # download skype
+
+== 2012.09.09 ==
+* Leon
+  # search and learn h264 doc
+  # vlc stream input. asked on vlc forcum
+
+* Arashmen
+  # h264 trying on adroid4.0
+
+* Duquanlong
+  # learning oauth
