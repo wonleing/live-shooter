@@ -1,8 +1,10 @@
 #!/usr/bin/python
-import xmlrpclib, os
-# run following command in other terminal, CTRL+C when you want to finish test
-# i=0;while ( true );do echo $i >> /var/ftp/pub/vwnexpch.mp4;((i+=1));done
+import xmlrpclib, os, time
 
 s=xmlrpclib.ServerProxy("http://127.0.0.1:8000")
-if s.genSegment("vwnexpch", "test video with number filler"):
-    s.finishRecord("vwnexpch")
+filename = s.startRecord("mytitle","mydesc")
+os.system("cp /home/leon/download/smile.flv /var/ftp/pub/%s.mp4" %filename)
+print "upload completed"
+time.sleep(60)
+s.finishRecord(filename)
+print "Finished"
