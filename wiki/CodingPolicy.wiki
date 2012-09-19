@@ -1,3 +1,5 @@
+#summary 工作守则
+
 = Coding Policy =
 
 1. 严格控制代码质量，结构层次清楚。lib, resource, logic严格分开
