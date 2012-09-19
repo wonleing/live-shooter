@@ -9,7 +9,7 @@
 ||视频录制，即时分割视频文件||Arashmen||2012/4/22||2012/5/7  ||Done||
 ||服务器视频下行到客户端播放Demo||Arashmen||2012/5/15||2012/5/20  ||Done||
 ||模块初步整合||Arashmen||2012/6/11||2012/6/15 ||Done||
-||视频文件实时上传至服务器:generate,update,finsh||Arashmen||2012/5/20|| ||In progress||
+||视频文件实时上传至服务器 via ftp stream||Arashmen||2012/5/20||2012/6/20||Done||
 ||Helix server and producer setup trail||Leon||2012/4/16||2012/4/19||Done||
 ||Http live streaming docs research||Leon||2012/4/17||2012/4/20||Done||
 ||Make use of VLC (open source) codec covertion||Leon||2012/4/17||2012/4/20||Done||
@@ -19,10 +19,10 @@
 ||Setup test server to integration test with server api and java client||Leon & Arashmen||2012/5/2||2012/6/2||Done||
 ||SIP solution research||Leon||2012/5/30||2012/6/16||Done||
 ||updateSegment and finishRecord apis||Leon||2012/6/16||2012/6/18||Done||
-||Try new socket transfer mode|| || || ||Waiting for owner||
+||socket multiple thread server, multiple thread client samples||Leon||2012/8/20||2012/8/31||Done||
+||vlc stream video to http live streaming, implement with xmlrpc apis||Leon||2012/8/31||2012/9/19||Done||
+||Debug client code to fit server xmlrpc api||2012/9/19|| ||In progress||Leon||
+||debug client stream video send to server, h264 problem||Leon||2012/9/19|| ||In progress||
 ||User interface design and framework implement|| || || ||Waiting for owner||
 ||Post video link to SNS and retrieve comments back|| || || ||Waiting for owner||
 ||Write docs about server setup and debug env|| || || ||Waiting for owner||
-||socket multiple thread server, multiple thread client samples||Leon||2012/8/20||2012/8/31||Done||
-||debug client stream video send to server, h264 problem||Leon||2012/8/27|| ||In progress||
-||vlc stream video to http live streaming||Leon||2012/8/31|| ||In progress||
