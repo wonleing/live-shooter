@@ -27,7 +27,7 @@ class WriteHandler(asyncore.dispatcher_with_send):
         data = self.recv(BUFSIZE)
         if data:
             self.f.write(data)
-            print "received: " + str(len(data))
+            #print "received: " + str(len(data))
 
     def handle_close(self):
         self.f.close()

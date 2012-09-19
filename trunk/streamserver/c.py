@@ -2,7 +2,7 @@ import socket,time,threading,os
 address = ("192.168.188.2", 8001)
 file = "/home/leon/download/smile.flv"
 BUFSIZE = 8196
-threads = 10
+threads = 1
 
 def sender(threadNumber):
     if os.path.exists(file):
@@ -16,7 +16,8 @@ def sender(threadNumber):
         stream = f.read(BUFSIZE)
         if stream:
             s.send(stream)
-            print "Sent %d bytes by Thread-%s" % (len(stream), threadNumber)
+            #print "Sent %d bytes by Thread-%s" % (len(stream), threadNumber)
+            time.sleep(0.1) 
         else:
             break
     f.close()

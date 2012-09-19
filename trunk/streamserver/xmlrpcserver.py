@@ -1,9 +1,9 @@
 #!/usr/bin/python
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
-import os, sys, random, optparse, logging, time, thread
+import os, sys, random, optparse, logging, time, socket, subprocess, thread, signal
 
-u = """%prog -s <server_ip>"""
+u = """./%prog -s <server_ip>\nDebug: ./%prog -s 127.0.0.1 > /dev/null 2>&1"""
 parser = optparse.OptionParser(u)
 parser.add_option('-s', '--server', help='stream server ip addres', dest='serverip')
 (options, leftargs) = parser.parse_args()
@@ -15,8 +15,9 @@ print "Starting service on", options.serverip
 server = SimpleXMLRPCServer((options.serverip, 8000))
 server.register_introspection_functions()
 
-segmentlength = 5
-videoinfo = {'width':352, 'hight':288, 'vbit':300, 'abit':64}
+PDIC = {}
+segmentlength = 2
+vinfo = {'width':480, 'hight':360, 'vbit':700, 'abit':96}
 uploadpath = "/var/ftp/pub/"
 httpdir = "/var/www/live-shooter/"
 exportdir = "http://" + options.serverip + "/live-shooter/"
@@ -34,44 +35,91 @@ class StreamServer:
             logger.error("Critical: %s is not installed" % cmd)
             sys.exit()
         
-    def _rand(self):
-        return "".join(random.sample('zyxwvutsrqponmlkjihgfedcba',8))
-
-    def genFilename(self):
-        self._check("/usr/bin/vlc")
-        rand = self._rand()
+    def _genFilename(self):
+        rand = "".join(random.sample('zyxwvutsrqponmlkjihgfedcba',8))
         if os.path.exists(uploadpath + rand):
             logger.info("random filename already existed, genFilename again!")
-            self.genFilename()
+            self._genFilename()
         logger.debug("genFilename returns ==%s== as the file name" % rand)
         return rand
 
-    def genSegment(self, filename, videotitle):
+    def _genPort(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind(('localhost', 0))
+        addr, port = s.getsockname()
+        s.close()
+        logger.debug("genPort returns ==%s== as the udp streaming port" % port)
+        return port
+
+    def _streaming(self, filename, port):
         infile = uploadpath + filename + ".mp4"
-        logger.debug("Starting to handle incoming video %s" %infile)
-        os.system("sudo chmod 666 %s" % infile)
-        self._createHtml(filename, videotitle)
-        seq = 1
-        while os.path.getsize(infile):
-            f = open(infile,"rb")
-            content = f.read()
-            f.close()
-            f = open(infile,"w")
-            f.write("")
-            f.close()
-            tmpseg = uploadpath + filename + "_" + str(seq) + ".mp4"
-            nf = open(tmpseg,"wb")
-            nf.write(content)
-            nf.close()
-            logger.debug("%s is splited out from the video stream" % tmpseg)
-            outfile = httpdir + filename + "_" + str(seq) + ".ts" 
-            thread.start_new_thread(self._videoconvert, (tmpseg, outfile))
-            self._writeIndex(filename, str(seq))
-            seq += 1
-            time.sleep(5)
+        outname = httpdir + filename
+        exportname = exportdir + filename
+        # Wait client upload stream via ftp with counter i
+        i = 0
+        while i<30 and not os.path.exists(infile):
+            time.sleep(0.1)
+            i += 1
+        if i == 30:
+            logger.error("%s upload from client timout. Please check the network" % infile)
+            return False
+        lag = 0.1*i
+        logger.debug("Start to stream %s after %.1f sec" % (infile, lag))
+        os.system("sudo chmod 666 %s" % infile) # Make upload stream read/writei-able
+        p1 = subprocess.Popen('vlc -I dummy %s --sout udp:localhost:%d' %(infile, port),\
+        stdout=None, stderr=None, shell=True, preexec_fn=os.setsid)
+        p2 = subprocess.Popen('''vlc -I dummy --sout "#transcode{width=%d,height=%d,vcodec=h264,vb=%d,venc=x264{aud,profile=baseline,\
+        level=30,keyint=30,ref=1},acodec=aac,ab=%d,deinterlace}:std{access=livehttp{seglen=%d,delsegs=true,numsegs=3,index=%s.m3u8,\
+        index-url=%s-########.ts},mux=ts{use-key-frames},dst=%s-########.ts}" udp://@localhost:%d vlc://quit'''
+        % (vinfo['width'], vinfo['hight'], vinfo['vbit'], vinfo['abit'], segmentlength, outname, exportname, outname, port),
+        stdout=None, stderr=None, shell=True, preexec_fn=os.setsid)
+        global PDIC
+        PDIC[filename] = (p1.pid, p2.pid)
+        PDIC[filename+"_lag"] = lag
+        logger.debug("current PDIC is: %s" %str(PDIC))
+        return True
+
+    def _createHtml(self, filename, videotitle, videodesc):
+        t = open("template.html", "r")
+        n = open(httpdir+filename+".html", "w")
+        n.write(t.read().replace("FileName", filename).replace("VideoTitle", videotitle).replace("VideoDesc", videodesc))
+        t.close()
+        n.close()
+        logger.debug("html page for %s created with Title %s" %(filename, videotitle))
+
+    def _cleanup(self, filename, pid, oauth):
+        if oauth:
+            #TBD, join all mp4 or ts file segments and upload to oauth destination
+            logger.debug("video uploaded to oauth web site")
+        time.sleep(5) # Wait for M3U8 index updating
+        os.killpg(pid, signal.SIGTERM)
+        time.sleep(60)
+        # Delete original upload mp4 files?
+        os.system("rm -rf %s*.mp4" % (uploadpath+filename))
+        os.system("rm -rf %s*" %(httpdir+filename))
+        logger.info("live video segments of %s completely deleted" %filename)
+
+    def startRecord(self, videotitle="", videodesc=""):
+        self._check("/usr/bin/vlc")
+        filename = self._genFilename()
+        port = self._genPort()
+        self._createHtml(filename, videotitle, videodesc)
+        thread.start_new_thread(self._streaming, (filename, port))
+        return filename
+
+    def finishRecord(self, filename, oauth=None):
+        global PDIC
+        time.sleep(PDIC[filename+"_lag"])
+        os.killpg(PDIC[filename][0], signal.SIGTERM)
+        logger.debug("Killed process group: %d. %s live streaming finished" %(PDIC[filename][0], filename))
+        thread.start_new_thread(self._cleanup, (filename, PDIC[filename][1], oauth))
+        PDIC.pop(filename)
+        PDIC.pop(filename+"_lag")
+        logger.debug("current PDIC is: %s" %str(PDIC))
         return True
 
     def _writeIndex(self, filename, seq):
+        # Unused, since VLC can take care of it right now.
         m3file = httpdir + filename + ".m3u8"
         m3tmp = "/tmp/" + filename + ".m3u8"
         if not os.path.exists(m3file):
@@ -91,37 +139,6 @@ class StreamServer:
         m = open(m3file, "w")
         m.write("".join(nc))
         m.close()
-
-    def _createHtml(self, filename, videotitle):
-        t = open("template.html", "r")
-        n = open(httpdir+filename+".html", "w")
-        n.write(t.read().replace("FileName", filename).replace("VideoTitle", videotitle))
-        t.close()
-        n.close()
-        logger.debug("html page for %s created. Title is %s" %(filename, videotitle))
-
-    def _videoconvert(self, infile, outfile):
-        try:
-            logger.debug("Start video convert from %s to %s" %(infile, outfile))
-            os.system('vlc -I dummy --sout \
-            "#transcode{width=%d,height=%d,vcodec=h264,vb=%d,acodec=mp4a,ab=%d}:std{mux=ts,dst=%s,access=file}" %s vlc://quit'
-            % (videoinfo['width'], videoinfo['hight'], videoinfo['vbit'], videoinfo['abit'], outfile, infile))
-            return True
-        except:
-            logger.error("vlc transcode failed on %s" % infile)
-            return False
-
-    def finishRecord(self, filename, oauth=None):
-        if oauth:
-            #TBD, join all mp4 or ts file segments and upload to oauth destination
-            logger.debug("video uploaded to oauth web site")
-        else:
-            time.sleep(30)
-        # Delete original upload mp4 files?
-        os.system("rm -rf %s*.mp4" % (uploadpath+filename))
-        os.system("rm -rf %s*" %(httpdir+filename))
-        logger.info("live video segments of %s completely deleted" %filename)
-        return True
 
 
 # Run the server's main loop
