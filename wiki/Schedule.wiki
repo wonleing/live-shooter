@@ -14,9 +14,9 @@
 ||Http live streaming docs research||Leon||2012/4/17||2012/4/20||Done||
 ||Make use of VLC (open source) codec covertion||Leon||2012/4/17||2012/4/20||Done||
 ||Linux stream server initialize||Leon||2012/4/17||2012/5/4||Done||
-||Design and try c/s xmlrpc protocol||Leon & Arashmen||2012/5/2||2012/5/13||Done||
+||Design and try c/s xmlrpc protocol||Leon||2012/5/2||2012/5/13||Done||
 ||Basic XMLRPC server apis||Leon||2012/5/13||2012/6/2||Done||
-||Setup test server to integration test with server api and java client||Leon & Arashmen||2012/5/2||2012/6/2||Done||
+||Setup test server to integration test with server api and java client||Leon||2012/5/2||2012/6/2||Done||
 ||SIP solution research||Leon||2012/5/30||2012/6/16||Done||
 ||updateSegment and finishRecord apis||Leon||2012/6/16||2012/6/18||Done||
 ||socket multiple thread server, multiple thread client samples||Leon||2012/8/20||2012/8/31||Done||
