@@ -21,8 +21,7 @@
 ||updateSegment and finishRecord apis||Leon||2012/6/16||2012/6/18||Done||
 ||socket multiple thread server, multiple thread client samples||Leon||2012/8/20||2012/8/31||Done||
 ||vlc stream video to http live streaming, implement with xmlrpc apis||Leon||2012/8/31||2012/9/19||Done||
-||Debug client code to fit server xmlrpc api||2012/9/19|| ||In progress||Leon||
-||debug client stream video send to server, h264 problem||Leon||2012/9/19|| ||In progress||
+||debug client stream video(h264 problem) and fit server xmlrpc api||Leon||2012/9/19|| ||In progress||
 ||User interface design and framework implement|| || || ||Waiting for owner||
 ||Post video link to SNS and retrieve comments back|| || || ||Waiting for owner||
 ||Write docs about server setup and debug env|| || || ||Waiting for owner||
