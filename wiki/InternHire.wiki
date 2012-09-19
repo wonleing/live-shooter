@@ -1,10 +1,10 @@
-#summary Brif introduction
+#summary Intern position
 
 = We are looking for interns =
 
-We are a start up company base in Beijing, developing this top new concept android/ios mobile application as the very first project of us.
-Our co-founders are all from very famous IT companies, because we believe only the smart people can do the smart things.
-Our project is on-going and you can briefly know what it is from our project wiki page.
+We must make sure you have enough ability and patience to read English doc before having you be a part of us(This is essential for our develop works). Just like other long English tech doc, it detailed some very import info about this position, how to get pay and how to apply.
+
+We are about to be a start up company base in Beijing, developing this top new concept android/ios mobile application as the very first project of us. Our co-founders are all from very famous IT companies, because we believe only the smart people can do the smart things. Our project is on-going and you can briefly know what it is from our project wiki page.
 
 http://code.google.com/p/live-shooter/ (especially the wiki section)
 
@@ -15,13 +15,11 @@ For now it is still a private project, and we have more internal docs which are 
 
 - Free work style. You don't have to go to office every day, since we can do it online instead.
 
-- Our professional direction. We top engineer will have more focus on you than other big companies.
+- Our professional direction and suggestion. We top engineer will have more focus on you than other big companies.
 
 - Top practical technology and international comprehension of software development.
 
-- Free suggestions, both directions. We don't have any level difference at all.
-
-- Compensation of lunch, traffic or any other you think that is required.
+- Bonus of finishing work module. Pick up work modules from schedule and estimate time and price. We will pay you when you finish it according to the quality. 
 
 - Possibility of share option. When our product got profit, you may get your share from it.
 
@@ -34,29 +32,18 @@ For now it is still a private project, and we have more internal docs which are 
 
 - Knowledge on Android/Java/IOS development. You don't have to be very skilled, but know how to use the serials of dev tools at least.
 
-- English reading, good at asking questions and able to search your answer on google (not baidu).
+- English reading, good at asking questions and able to search your answer with English.(This can provide you preciser answers)
 
-- Be a good team worker
+- Be a good team worker, take mail and IM communication seriously.
 
-- Passion, patience and plenty of time
+- Passion, patience and plenty of time.
 
 
 You may not able to get lots of money from this intern position, but what you may get is more valuable than it.
 We small but very international formed, we start from scratch but potential to be a winner. 
-So please take a serious consideration and send me(wonleing@163.com or wonleing@gmail.com) a mail for applying this internship if you have intrest on it.
+So please take a serious consideration and send me(wonleing@163.com or live-shooter@googlegroups.com) a mail for applying this internship if you have intrest on it.
 
 
 Leon Wang
 
 Live-shooter co-founder
-
-2012/08/23
-
-
-= 关于工作方式及报酬 =
-
-我们平时的工作方式以远程工作为主（类似于开源社区式开发小组），我们通过wiki schedule来分发工作内容，跟踪工作进度，以邮件及IM为主要交流方式。有固定的weekly online meeting时间，及不固定的线下meeting。大家根据自己可投入的时间及能力在schedule上选择自己的工作内容（模块），同时预估完成该模块的时间及报酬，每完成一个工作模块便可得到相应的报酬（完成质量是重要参考因素），从而达到多劳多得的激励效果。
-
-如果你感兴趣请给我(wonleing@163.com)或我们的mail list(live-shooter@googlegroups.com)发邮件确认，之后我会帮你处理一些关于项目的svn, wiki, schedule，邮件列表，IM群，开发环境搭建等问题。
-
-- Leon
