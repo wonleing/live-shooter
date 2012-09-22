@@ -1,11 +1,8 @@
 package com.android.liveshooter.activity;
-import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Socket;
 import java.util.Vector;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
@@ -33,13 +30,34 @@ public class LiveShooterService {
 	private LocalServerSocket lss;
 	private MediaRecorder mMediaRecorder;
 	private SurfaceHolder holder;
-	private String SegmentName;
+	private String VideoName;
 	private InputStream fis;
 	private OutputStream out;
-	private boolean flag;
-	
 	public LiveShooterService(SurfaceHolder holder) throws Exception{
 		this.holder = holder;
+	}
+	
+	private boolean initializeVideo(){
+		mMediaRecorder = new MediaRecorder();
+		mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+		mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);//MIC
+		mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+		mMediaRecorder.setVideoFrameRate(30);
+		mMediaRecorder.setVideoSize(352, 288);
+		mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);//MPEG_4_SP
+		mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);//AAC
+		mMediaRecorder.setPreviewDisplay(holder.getSurface());
+		mMediaRecorder.setMaxDuration(500000000);
+		mMediaRecorder.setMaxFileSize(500000000);
+		mMediaRecorder.setOutputFile(sender.getFileDescriptor());
+		try {
+			mMediaRecorder.prepare();
+			mMediaRecorder.start();
+		} catch (IOException exception) {
+			releaseMediaRecorder();
+			return false;
+		}
+		return true;
 	}
 	
 	private void init() throws Exception {
@@ -54,42 +72,72 @@ public class LiveShooterService {
 		initializeVideo();
 	}
 
-	public boolean initializeVideo(){
-		mMediaRecorder = new MediaRecorder();
-		mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-		mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-		mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-		mMediaRecorder.setVideoFrameRate(30);
-		mMediaRecorder.setVideoSize(352, 288);
-		mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-		mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-		mMediaRecorder.setPreviewDisplay(holder.getSurface());
-		mMediaRecorder.setMaxDuration(500000000);
-		mMediaRecorder.setMaxFileSize(500000000);
-		mMediaRecorder.setOutputFile(sender.getFileDescriptor());
+	private boolean uploadFile(String url, String port, String username, String password, String path, String filename, InputStream input) {
+		FTPClient ftp = new FTPClient();
 		try {
-			mMediaRecorder.prepare();
-			mMediaRecorder.start();
-		} catch (IOException exception) {
-			releaseMediaRecorder();
-			return false;
+			int reply;
+		    ftp.connect(url);
+			ftp.login(username, password);
+			reply = ftp.getReplyCode();
+			if (!FTPReply.isPositiveCompletion(reply)) {
+				ftp.disconnect();
+				return false;
+			}
+			ftp.changeWorkingDirectory(path);
+			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+			ftp.storeFile(filename, input);
+			input.close();
+			ftp.logout();
+		} catch (IOException e) {
+			Log.i("msg", e.getMessage());
+		} finally {
+            try {
+				ftp.disconnect();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		return true;
-	}
+    }
 
-	public void releaseMediaRecorder() {
+	private String execute(InputStream in) throws Exception {
+		XmlRpcClient client = new XmlRpcClient(serverUrl + ":8000/");
+		Vector<Object> params = new Vector<Object>();
+		// TBD: input video title and description from UI
+		params.add("My Video Title");
+		params.add("My Video Description");
+		VideoName = client.execute("startRecord", params).toString();
+		String urlStr = serverUrl + "/live-shooter/" + VideoName + ".html";
+		Log.i("msg", "Returned playback URL is: " + urlStr);
+		if (uploadFile(IPaddr, FTPport, FTPuser, FTPpass, FTPdir, VideoName + SegmentExt, in)){
+			return urlStr;
+		} else {
+		return "";
+		}
+	}
+	
+	private void releaseMediaRecorder() {
 		if(mMediaRecorder !=null){
 			mMediaRecorder.stop();
 			mMediaRecorder.release();
 			mMediaRecorder = null;
 		}
 	}
+	
+	private void finishSegment()throws Exception{
+		XmlRpcClient client = new XmlRpcClient(serverUrl + ":8000/");
+		Vector<Object> params = new Vector<Object>();
+		//Todo: Add oauth args to control if video upload to other video website
+		params.addElement(VideoName);
+		String finalResult = client.execute("finishRecord", params).toString();
+		Log.i("msg", "finishRecord = "+ finalResult);
+	}
 
 	public void startVideoRecording() {
 		try {
 			init();
-		} catch (Exception e3) {
-			e3.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		new Thread() {
 			public void run() {
@@ -138,7 +186,12 @@ public class LiveShooterService {
 					out.write(h264sps);
 					out.write(h264head);
 					out.write(h264pps);
-					execute2(fis);
+                    if (execute(fis)!=""){
+                    	//Todo: Post video title, description etc to SNS.	
+                    	//Todo: Show comment feed back. (Pop up?)
+					} else {
+						Log.i("err", "Fail to upload video stream");
+					}
 				} catch (Exception e) {
 					Log.i("exception", e.getMessage());
 				}
@@ -146,89 +199,10 @@ public class LiveShooterService {
 		}.start();
 	}
 	
-	private void execute2(InputStream in) throws Exception {
-//		FileInputStream fileInput = new FileInputStream(new File("/mnt/sdcard/Arashmen/Bad Aibling.rar"));
-		Log.i("msg","socket start...");
-		Socket s = new Socket(IPaddr, Socketport);
-		s.setKeepAlive(true);
-		OutputStream netout = s.getOutputStream();
-		OutputStream out = new DataOutputStream(new BufferedOutputStream(netout));
-		Log.i("msg","out....");
-		while(!flag){
-			byte[] buff = new byte[in.available()];
-			int num = in.read(buff);
-			Log.i("msg", "num = " + num);
-			if(num!=-1){
-				out.write(buff);
-			}else{
-				flag = true;
-			}
-			Thread.sleep(100);
-			Log.i("msg","success ");
-		}
-		out.flush();
-		out.close();
-		in.close();
-		s.close();
-	}
-
-	private void execute(InputStream in) throws Exception {
-		XmlRpcClient client = new XmlRpcClient(serverUrl + ":8000/");
-		Vector<Object> params = new Vector<Object>();
-		SegmentName = client.execute("genFilename", params).toString();
-		String urlStr = serverUrl + "/live-shooter/" + SegmentName + ".html";
-		Log.i("msg", "urlStr = " + urlStr);
-		Vector<Object> paramsDemo = new Vector<Object>();
-		paramsDemo.addElement(SegmentName);
-		paramsDemo.add("Live Shooter");
-		String finalResult = client.execute("genSegment", paramsDemo).toString();
-		boolean isSuccess = uploadFile(IPaddr, FTPport, FTPuser, FTPpass, FTPdir, SegmentName + SegmentExt, in);
-		int count = 0;
-		while(!flag){
-			Thread.sleep(5000);
-			count ++;
-			paramsDemo.addElement(SegmentName);
-			paramsDemo.addElement(""+count);
-			String finalResult1 = client.execute("updateSegment", paramsDemo).toString();
-			boolean isSuccess1 = uploadFile(IPaddr, FTPport, FTPuser, FTPpass, FTPdir, SegmentName + SegmentExt, in);
-		}
-	}
-	
-	public boolean uploadFile(String url, String port, String username, String password, String path, String filename, InputStream input) {
-		boolean returnValue = false;
-		FTPClient ftp = new FTPClient();
-		try {
-			int reply;
-		    ftp.connect(url);
-			ftp.login(username, password);// 登录
-			reply = ftp.getReplyCode();
-			if (!FTPReply.isPositiveCompletion(reply)) {
-				ftp.disconnect();
-				return returnValue;
-			}
-			ftp.changeWorkingDirectory(path);
-			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
-			ftp.storeFile(filename, input);
-			input.close();
-			ftp.logout();
-			returnValue = true;
-		} catch (IOException e) {
-			Log.i("msg", e.getMessage());
-		} finally {
-			if (ftp.isConnected()) {
-				try {
-					ftp.disconnect();
-				} catch (IOException ioe) {
-				}
-			}
-		}
-		return returnValue;
-    }
-	
-	public void shutdownInput() throws IOException{
-		flag = true;
+	public void shutdownInput() throws Exception{
 		receiver.shutdownInput();
 		releaseMediaRecorder();
+		finishSegment();
 		lss.close();
 		lss = null;
 		sender.close();
@@ -236,12 +210,6 @@ public class LiveShooterService {
 		receiver.close();
 		receiver = null;
 	}
-	
-	private void finishSegment()throws Exception{
-		XmlRpcClient client = new XmlRpcClient(serverUrl + ":8000/");
-		Vector<Object> paramsDemo = new Vector<Object>();
-		paramsDemo.addElement(SegmentName);
-		String finalResult = client.execute("finishRecord", paramsDemo).toString();
-		Log.i("msg", "finishRecord = "+ finalResult);
-	}
 }
+
+
