@@ -42,7 +42,8 @@ public class VideoActivity extends Activity implements  SurfaceHolder.Callback{
 					try {
 						service.shutdownInput();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 					android.os.Process.killProcess(android.os.Process.myPid()) ;
