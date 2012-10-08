@@ -4,15 +4,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Vector;
+
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.xmlrpc.XmlRpcClient;
+
 import android.media.MediaRecorder;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 import android.util.Log;
 import android.view.SurfaceHolder;
+
+import com.android.liveshooter.util.Tools;
 
 public class LiveShooterService {
 	public static final String IPaddr = "192.168.188.2";
@@ -40,12 +44,12 @@ public class LiveShooterService {
 	private boolean initializeVideo(){
 		mMediaRecorder = new MediaRecorder();
 		mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-		mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);//MIC
+		//mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);//MIC
 		mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-		mMediaRecorder.setVideoFrameRate(30);
+		mMediaRecorder.setVideoFrameRate(15);
 		mMediaRecorder.setVideoSize(352, 288);
 		mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);//MPEG_4_SP
-		mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);//AAC
+		//mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);//AAC
 		mMediaRecorder.setPreviewDisplay(holder.getSurface());
 		mMediaRecorder.setMaxDuration(500000000);
 		mMediaRecorder.setMaxFileSize(500000000);
@@ -155,6 +159,7 @@ public class LiveShooterService {
 				// esds box MPEG_4_SP 的设置参数
 				// 其实 如果分辨率 等数值不变的话，这些参数是不会变化的，
 				// 那么我就只需要在第一次运行的时候确定就可以了
+				/*
 				while (true) {
 					try {
 						num = fis.read(buffer, number, frame_size);
@@ -176,16 +181,81 @@ public class LiveShooterService {
 				} catch (IOException e2) {
 					e2.printStackTrace();
 				}
+				*/
 				// 这些参数要对应我现在的视频设置，如果想变化的话需要去重新确定，
 				// //当然不知道是不是不同的机器是不是一样，我这里只有一个HTC G7做测试。
 				byte[] h264sps  = { 0x67, 0x42, 0x00, 0x0C, (byte) 0x96, 0x54,0x0B, 0x04, (byte) 0xA2 };
 				byte[] h264pps  = { 0x68, (byte) 0xCE, 0x38, (byte) 0x80 };
 				byte[] h264head = { 0, 0, 0, 1 };
+				byte[] temp = new byte[32];
 				try {
+					while(true){					
+						fis.read(temp, 0, 8);
+						int len = Tools.bytes2int(temp, 4);
+						String type = new String(temp, 4, 4);
+						Log.i("Type", type);
+						if(len <= 0) {
+							Thread.sleep(5);
+							continue;
+						}
+						if(temp[4] == 'a' && temp[5] == 'v' && temp[6] == 'c' && temp[7] == 'C'){ //find the avcC box
+							fis.skip(6);
+							fis.read(temp, 0, 2);
+							int spslen = Tools.bytes2int(temp, 2);
+							byte[] sps = new byte[spslen];
+							fis.read(sps, 0, spslen);
+							fis.skip(1);
+							fis.read(temp, 0, 2);
+							int ppslen = Tools.bytes2int(temp, 2);
+							byte[] pps = new byte[ppslen];
+							fis.read(pps, 0, ppslen);
+							fis.skip(len - 8 - 8 - spslen - 3 - ppslen);
+						}
+						else{
+							//'mdat'
+							if(temp[4] == 'm' && temp[5] == 'd' && temp[6] == 'a' && temp[7] == 't'){ //find the mdat box
+								break;
+							}
+							fis.skip(len - 8);
+						}
+					}
+					
 					out.write(h264head);
 					out.write(h264sps);
 					out.write(h264head);
 					out.write(h264pps);
+					
+					while(true){
+						try {
+							//读取每个NAL的长度
+							if(fis.available() < 4){
+								continue;
+							}
+							fis.read(temp, 0, 4);
+							int h264length = Tools.bytes2int(temp, 4);
+							int offset = 0;
+							while(offset < h264length)
+							{
+								int lost = h264length - offset;
+								int k = 0;
+								try {
+									k = fis.read(buffer, offset, lost);
+								} catch(Exception e){
+									return;
+								}
+								if(k <= 0){
+									continue;
+								}
+								offset += k;
+							}
+							
+							out.write(buffer, 0, h264length + h264head.length);
+			
+						} catch (IOException e) {
+							e.printStackTrace();
+							break;
+						} 
+					}
                     if (execute(fis)!=""){
                     	//Todo: Post video title, description etc to SNS.	
                     	//Todo: Show comment feed back. (Pop up?)
