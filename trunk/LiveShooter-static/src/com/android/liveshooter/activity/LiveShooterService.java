@@ -29,13 +29,13 @@ public class LiveShooterService {
 	public static final String FTPpass = "shooter";
 	public static final String SegmentExt = ".mp4";
 	public static final String serverUrl = "http://" + IPaddr;
-	private LocalSocket receiver;
-	private LocalSocket sender;
-	private LocalServerSocket lss;
+	private LocalSocket receiver, middleReceiver;
+	private LocalSocket sender, endSender;
+	private LocalServerSocket lss, transferServer;
 	private MediaRecorder mMediaRecorder;
 	private SurfaceHolder holder;
 	private String VideoName;
-	private InputStream fis;
+	private InputStream fis, fis2;
 	private OutputStream out;
 	public LiveShooterService(SurfaceHolder holder) throws Exception{
 		this.holder = holder;
@@ -73,6 +73,17 @@ public class LiveShooterService {
 		sender = lss.accept();
 		sender.setReceiveBufferSize(50000000);
 		sender.setSendBufferSize(50000000);
+		
+		//中转ServerSocket
+		transferServer = new LocalServerSocket("Buffer");
+		middleReceiver = new LocalSocket();
+		middleReceiver.connect(new LocalSocketAddress("Buffer"));
+		middleReceiver.setReceiveBufferSize(50000000);
+		middleReceiver.setSendBufferSize(50000000);
+		endSender = transferServer.accept();
+		endSender.setReceiveBufferSize(50000000);
+		endSender.setSendBufferSize(50000000);
+		
 		initializeVideo();
 	}
 
@@ -182,6 +193,14 @@ public class LiveShooterService {
 					e2.printStackTrace();
 				}
 				*/
+				try {
+					out = endSender.getOutputStream();
+					fis2 = middleReceiver.getInputStream();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 				// 这些参数要对应我现在的视频设置，如果想变化的话需要去重新确定，
 				// //当然不知道是不是不同的机器是不是一样，我这里只有一个HTC G7做测试。
 				byte[] h264sps  = { 0x67, 0x42, 0x00, 0x0C, (byte) 0x96, 0x54,0x0B, 0x04, (byte) 0xA2 };
@@ -256,7 +275,7 @@ public class LiveShooterService {
 							break;
 						} 
 					}
-                    if (execute(fis)!=""){
+                    if (execute(fis2)!=""){
                     	//Todo: Post video title, description etc to SNS.	
                     	//Todo: Show comment feed back. (Pop up?)
 					} else {
