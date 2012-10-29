@@ -1,5 +1,5 @@
 package com.android.liveshooter.activity;
-import java.io.DataInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,13 +13,14 @@ import android.media.MediaRecorder;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
+import android.os.Environment;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.android.liveshooter.util.Tools;
 
 public class LiveShooterService {
-	public static final String IPaddr = "192.168.188.2";
+	public static final String IPaddr = "192.168.1.108";
 	public static final int XMLRPCport = 8000;
 	public static final int Socketport = 8001;
 	public static final String Httpdir = "/live-shooter";
@@ -201,6 +202,18 @@ public class LiveShooterService {
 					e1.printStackTrace();
 				}
 				
+				try {
+					if (execute(fis2)!=""){
+						//Todo: Post video title, description etc to SNS.	
+						//Todo: Show comment feed back. (Pop up?)
+					} else {
+						Log.i("err", "Fail to upload video stream");
+					}
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 				// 这些参数要对应我现在的视频设置，如果想变化的话需要去重新确定，
 				// //当然不知道是不是不同的机器是不是一样，我这里只有一个HTC G7做测试。
 				byte[] h264sps  = { 0x67, 0x42, 0x00, 0x0C, (byte) 0x96, 0x54,0x0B, 0x04, (byte) 0xA2 };
@@ -274,12 +287,6 @@ public class LiveShooterService {
 							e.printStackTrace();
 							break;
 						} 
-					}
-                    if (execute(fis2)!=""){
-                    	//Todo: Post video title, description etc to SNS.	
-                    	//Todo: Show comment feed back. (Pop up?)
-					} else {
-						Log.i("err", "Fail to upload video stream");
 					}
 				} catch (Exception e) {
 					Log.i("exception", e.getMessage());
