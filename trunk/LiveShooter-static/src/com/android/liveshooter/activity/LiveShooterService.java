@@ -1,5 +1,4 @@
 package com.android.liveshooter.activity;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,14 +12,13 @@ import android.media.MediaRecorder;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
-import android.os.Environment;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.android.liveshooter.util.Tools;
 
 public class LiveShooterService {
-	public static final String IPaddr = "192.168.1.108";
+	public static final String IPaddr = "192.168.43.54";
 	public static final int XMLRPCport = 8000;
 	public static final int Socketport = 8001;
 	public static final String Httpdir = "/live-shooter";
@@ -38,6 +36,9 @@ public class LiveShooterService {
 	private String VideoName;
 	private InputStream fis, fis2;
 	private OutputStream out;
+	
+	private FTPClient ftp;
+	
 	public LiveShooterService(SurfaceHolder holder) throws Exception{
 		this.holder = holder;
 	}
@@ -89,7 +90,7 @@ public class LiveShooterService {
 	}
 
 	private boolean uploadFile(String url, String port, String username, String password, String path, String filename, InputStream input) {
-		FTPClient ftp = new FTPClient();
+		ftp = new FTPClient();
 		try {
 			int reply;
 		    ftp.connect(url);
@@ -101,6 +102,7 @@ public class LiveShooterService {
 			}
 			ftp.changeWorkingDirectory(path);
 			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+			
 			ftp.storeFile(filename, input);
 			input.close();
 			ftp.logout();
@@ -128,7 +130,7 @@ public class LiveShooterService {
 		if (uploadFile(IPaddr, FTPport, FTPuser, FTPpass, FTPdir, VideoName + SegmentExt, in)){
 			return urlStr;
 		} else {
-		return "";
+			return "";
 		}
 	}
 	
@@ -157,15 +159,13 @@ public class LiveShooterService {
 		}
 		new Thread() {
 			public void run() {
-				int frame_size = 2048 * 2048;
-				byte[] buffer = new byte[1024 * 2048];
-				int num, number = 0;
+				int frame_size = 20480;
+				byte[] buffer = new byte[frame_size];
 				try {
 					fis = receiver.getInputStream();
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-				number = 0;
 				// 如果是H264或是MPEG_4_SP的就要在这里找到相应的设置参数的流
 				// avcC box H264的设置参数
 				// esds box MPEG_4_SP 的设置参数
@@ -196,20 +196,7 @@ public class LiveShooterService {
 				*/
 				try {
 					out = endSender.getOutputStream();
-					fis2 = middleReceiver.getInputStream();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				
-				try {
-					if (execute(fis2)!=""){
-						//Todo: Post video title, description etc to SNS.	
-						//Todo: Show comment feed back. (Pop up?)
-					} else {
-						Log.i("err", "Fail to upload video stream");
-					}
-				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -266,14 +253,15 @@ public class LiveShooterService {
 							fis.read(temp, 0, 4);
 							int h264length = Tools.bytes2int(temp, 4);
 							int offset = 0;
+							System.arraycopy(h264head, 0, buffer, 0, h264head.length);
 							while(offset < h264length)
 							{
 								int lost = h264length - offset;
 								int k = 0;
 								try {
-									k = fis.read(buffer, offset, lost);
+									k = fis.read(buffer, offset + h264head.length, lost);
 								} catch(Exception e){
-									return;
+									Log.i("video", e.getMessage());
 								}
 								if(k <= 0){
 									continue;
@@ -281,6 +269,7 @@ public class LiveShooterService {
 								offset += k;
 							}
 							
+							Log.i("video", "" + (h264length + h264head.length));
 							out.write(buffer, 0, h264length + h264head.length);
 			
 						} catch (IOException e) {
@@ -289,7 +278,29 @@ public class LiveShooterService {
 						} 
 					}
 				} catch (Exception e) {
-					Log.i("exception", e.getMessage());
+					Log.i("video", e.getMessage());
+				}
+			}
+		}.start();
+	}
+	
+	/**
+	 * Use Thread to start Ftp transfer data for it is a block process
+	 */
+	public void startFtp(){
+		new Thread(){
+			public void run(){
+				try {
+					fis2 = middleReceiver.getInputStream();
+					if (execute(fis2)!=""){
+						//Todo: Post video title, description etc to SNS.	
+						//Todo: Show comment feed back. (Pop up?)
+					} else {
+						Log.i("err", "Fail to upload video stream");
+					}
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
 			}
 		}.start();
@@ -305,6 +316,10 @@ public class LiveShooterService {
 		sender = null;
 		receiver.close();
 		receiver = null;
+		
+		if(ftp != null){
+			ftp.logout();
+		}
 	}
 }
 
