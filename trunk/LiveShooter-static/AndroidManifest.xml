@@ -44,7 +44,7 @@
 			<!-- The permission of WRITE_EXTERNAL_STORAGE is Optional.To get auto update. Store the APK -->
 			<!-- The permission of ACCESS_NETWORK_STATE. To estimate if there have network, to do auto update -->
 			<!-- The permission of READ_LOGS is Optional. To get the crash information  -->
-			<uses-permission android:name="android.permission.READ_LOGS"/>   
+			<!-- <uses-permission android:name="android.permission.READ_LOGS"/>  -->   
 			    
 			
 			<activity 
