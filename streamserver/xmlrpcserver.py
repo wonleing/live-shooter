@@ -17,6 +17,8 @@ server.register_introspection_functions()
 
 PDIC = {}
 segmentlength = 2
+segnum = 3
+ext = ".h264"
 vinfo = {'width':480, 'hight':360, 'vbit':700, 'abit':96}
 uploadpath = "/var/ftp/pub/"
 httpdir = "/var/www/live-shooter/"
@@ -52,26 +54,27 @@ class StreamServer:
         return port
 
     def _streaming(self, filename, port):
-        infile = uploadpath + filename + ".mp4"
+        infile = uploadpath + filename + ext
         outname = httpdir + filename
         exportname = exportdir + filename
         # Wait client upload stream via ftp with counter i
         i = 0
         while i<30 and not os.path.exists(infile):
-            time.sleep(0.1)
+            time.sleep(0.2)
             i += 1
         if i == 30:
             logger.error("%s upload from client timout. Please check the network" % infile)
             return False
-        lag = 0.1*i
+        time.sleep(0.2)
+        lag = 0.2*(i+1)
         logger.debug("Start to stream %s after %.1f sec" % (infile, lag))
-        os.system("sudo chmod 666 %s" % infile) # Make upload stream read/writei-able
+        #os.system("sudo chmod 666 %s" % infile) # Make upload stream read/write-able
         p1 = subprocess.Popen('vlc -I dummy %s --sout udp:localhost:%d' %(infile, port),\
         stdout=None, stderr=None, shell=True, preexec_fn=os.setsid)
         p2 = subprocess.Popen('''vlc -I dummy --sout "#transcode{width=%d,height=%d,vcodec=h264,vb=%d,venc=x264{aud,profile=baseline,\
-        level=30,keyint=30,ref=1},acodec=aac,ab=%d,deinterlace}:std{access=livehttp{seglen=%d,delsegs=true,numsegs=3,index=%s.m3u8,\
+        level=30,keyint=30,ref=1},acodec=aac,ab=%d,deinterlace}:std{access=livehttp{seglen=%d,delsegs=true,numsegs=%d,index=%s.m3u8,\
         index-url=%s-########.ts},mux=ts{use-key-frames},dst=%s-########.ts}" udp://@localhost:%d vlc://quit'''
-        % (vinfo['width'], vinfo['hight'], vinfo['vbit'], vinfo['abit'], segmentlength, outname, exportname, outname, port),
+        % (vinfo['width'], vinfo['hight'], vinfo['vbit'], vinfo['abit'], segmentlength, segnum, outname, exportname, outname, port),
         stdout=None, stderr=None, shell=True, preexec_fn=os.setsid)
         global PDIC
         PDIC[filename] = (p1.pid, p2.pid)
@@ -89,13 +92,13 @@ class StreamServer:
 
     def _cleanup(self, filename, pid, oauth):
         if oauth:
-            #TBD, join all mp4 or ts file segments and upload to oauth destination
+            #TBD, upload original video to oauth destination
             logger.debug("video uploaded to oauth web site")
         time.sleep(5) # Wait for M3U8 index updating
         os.killpg(pid, signal.SIGTERM)
         time.sleep(60)
-        # Delete original upload mp4 files?
-        os.system("rm -rf %s*.mp4" % (uploadpath+filename))
+        # Delete original uploaded video files?
+        os.system("rm -rf %s" % (uploadpath+filename+ext))
         os.system("rm -rf %s*" %(httpdir+filename))
         logger.info("live video segments of %s completely deleted" %filename)
 
@@ -103,8 +106,8 @@ class StreamServer:
         self._check("/usr/bin/vlc")
         filename = self._genFilename()
         port = self._genPort()
-        self._createHtml(filename, videotitle, videodesc)
         thread.start_new_thread(self._streaming, (filename, port))
+        self._createHtml(filename, videotitle, videodesc)
         return filename
 
     def finishRecord(self, filename, oauth=None):

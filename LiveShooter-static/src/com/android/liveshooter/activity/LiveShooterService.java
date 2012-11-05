@@ -3,22 +3,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Vector;
-
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.xmlrpc.XmlRpcClient;
-
 import android.media.MediaRecorder;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 import android.util.Log;
 import android.view.SurfaceHolder;
-
 import com.android.liveshooter.util.Tools;
 
 public class LiveShooterService {
-	public static final String IPaddr = "192.168.43.54";
+	public static final String IPaddr = "192.168.188.2";
 	public static final int XMLRPCport = 8000;
 	public static final int Socketport = 8001;
 	public static final String Httpdir = "/live-shooter";
@@ -26,7 +23,7 @@ public class LiveShooterService {
 	public static final String FTPport = "21";
 	public static final String FTPuser = "live";
 	public static final String FTPpass = "shooter";
-	public static final String SegmentExt = ".mp4";
+	public static final String SegmentExt = ".h264";
 	public static final String serverUrl = "http://" + IPaddr;
 	private LocalSocket receiver, middleReceiver;
 	private LocalSocket sender, endSender;
@@ -36,9 +33,7 @@ public class LiveShooterService {
 	private String VideoName;
 	private InputStream fis, fis2;
 	private OutputStream out;
-	
 	private FTPClient ftp;
-	
 	public LiveShooterService(SurfaceHolder holder) throws Exception{
 		this.holder = holder;
 	}
@@ -75,7 +70,6 @@ public class LiveShooterService {
 		sender = lss.accept();
 		sender.setReceiveBufferSize(50000000);
 		sender.setSendBufferSize(50000000);
-		
 		//中转ServerSocket
 		transferServer = new LocalServerSocket("Buffer");
 		middleReceiver = new LocalSocket();
@@ -85,7 +79,6 @@ public class LiveShooterService {
 		endSender = transferServer.accept();
 		endSender.setReceiveBufferSize(50000000);
 		endSender.setSendBufferSize(50000000);
-		
 		initializeVideo();
 	}
 
@@ -102,12 +95,11 @@ public class LiveShooterService {
 			}
 			ftp.changeWorkingDirectory(path);
 			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
-			
 			ftp.storeFile(filename, input);
 			input.close();
 			ftp.logout();
 		} catch (IOException e) {
-			Log.i("msg", e.getMessage());
+			Log.e("liveshooter", e.getMessage());
 		} finally {
             try {
 				ftp.disconnect();
@@ -126,7 +118,7 @@ public class LiveShooterService {
 		params.add("My Video Description");
 		VideoName = client.execute("startRecord", params).toString();
 		String urlStr = serverUrl + "/live-shooter/" + VideoName + ".html";
-		Log.i("msg", "Returned playback URL is: " + urlStr);
+		Log.i("liveshooter", "Returned playback URL is: " + urlStr);
 		if (uploadFile(IPaddr, FTPport, FTPuser, FTPpass, FTPdir, VideoName + SegmentExt, in)){
 			return urlStr;
 		} else {
@@ -148,7 +140,7 @@ public class LiveShooterService {
 		//Todo: Add oauth args to control if video upload to other video website
 		params.addElement(VideoName);
 		String finalResult = client.execute("finishRecord", params).toString();
-		Log.i("msg", "finishRecord = "+ finalResult);
+		Log.i("liveshooter", "finishRecord = "+ finalResult);
 	}
 
 	public void startVideoRecording() {
@@ -159,50 +151,19 @@ public class LiveShooterService {
 		}
 		new Thread() {
 			public void run() {
-				int frame_size = 20480;
+				int frame_size = 10240;
 				byte[] buffer = new byte[frame_size];
 				try {
 					fis = receiver.getInputStream();
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-				// 如果是H264或是MPEG_4_SP的就要在这里找到相应的设置参数的流
-				// avcC box H264的设置参数
-				// esds box MPEG_4_SP 的设置参数
-				// 其实 如果分辨率 等数值不变的话，这些参数是不会变化的，
-				// 那么我就只需要在第一次运行的时候确定就可以了
-				/*
-				while (true) {
-					try {
-						num = fis.read(buffer, number, frame_size);
-						number += num;
-						if (num < frame_size) {
-							break;
-						}
-					} catch (Exception e) {
-						break;
-					}
-				}
-				number = 0;
-				// 重新启动捕获，以获取视频流
-				DataInputStream dis = new DataInputStream(fis);
-				// 读取最前面的32个自己的空头
-				try {
-					dis.read(buffer, 0, 32);
-					out = sender.getOutputStream();
-				} catch (IOException e2) {
-					e2.printStackTrace();
-				}
-				*/
 				try {
 					out = endSender.getOutputStream();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
-				// 这些参数要对应我现在的视频设置，如果想变化的话需要去重新确定，
-				// //当然不知道是不是不同的机器是不是一样，我这里只有一个HTC G7做测试。
+				// 这些固定参数仅适用于HTC G7, 将来要改成动态生成的
 				byte[] h264sps  = { 0x67, 0x42, 0x00, 0x0C, (byte) 0x96, 0x54,0x0B, 0x04, (byte) 0xA2 };
 				byte[] h264pps  = { 0x68, (byte) 0xCE, 0x38, (byte) 0x80 };
 				byte[] h264head = { 0, 0, 0, 1 };
@@ -231,19 +192,17 @@ public class LiveShooterService {
 							fis.skip(len - 8 - 8 - spslen - 3 - ppslen);
 						}
 						else{
-							//'mdat'
-							if(temp[4] == 'm' && temp[5] == 'd' && temp[6] == 'a' && temp[7] == 't'){ //find the mdat box
+							//find the mdat box
+							if(temp[4] == 'm' && temp[5] == 'd' && temp[6] == 'a' && temp[7] == 't'){
 								break;
 							}
 							fis.skip(len - 8);
 						}
 					}
-					
 					out.write(h264head);
 					out.write(h264sps);
 					out.write(h264head);
 					out.write(h264pps);
-					
 					while(true){
 						try {
 							//读取每个NAL的长度
@@ -261,24 +220,22 @@ public class LiveShooterService {
 								try {
 									k = fis.read(buffer, offset + h264head.length, lost);
 								} catch(Exception e){
-									Log.i("video", e.getMessage());
+									Log.e("liveshooter", e.getMessage());
 								}
 								if(k <= 0){
 									continue;
 								}
 								offset += k;
 							}
-							
-							Log.i("video", "" + (h264length + h264head.length));
+							Log.i("liveshooter", "h264headerlength: " + (h264length + h264head.length));
 							out.write(buffer, 0, h264length + h264head.length);
-			
 						} catch (IOException e) {
 							e.printStackTrace();
 							break;
 						} 
 					}
 				} catch (Exception e) {
-					Log.i("video", e.getMessage());
+					Log.e("liveshooter", e.getMessage());
 				}
 			}
 		}.start();
@@ -296,10 +253,9 @@ public class LiveShooterService {
 						//Todo: Post video title, description etc to SNS.	
 						//Todo: Show comment feed back. (Pop up?)
 					} else {
-						Log.i("err", "Fail to upload video stream");
+						Log.e("liveshooter", "Fail to upload video stream");
 					}
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -316,11 +272,8 @@ public class LiveShooterService {
 		sender = null;
 		receiver.close();
 		receiver = null;
-		
 		if(ftp != null){
 			ftp.logout();
 		}
 	}
 }
-
-
