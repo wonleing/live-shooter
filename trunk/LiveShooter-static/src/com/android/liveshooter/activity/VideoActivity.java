@@ -35,7 +35,7 @@ public class VideoActivity extends Activity implements  SurfaceHolder.Callback{
         btn_start.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				service.startVideoRecording();  
-				service.startFtp();
+				service.startVideoUpload();
 			}
 		});
         btn_stop.setOnClickListener(new OnClickListener() {
