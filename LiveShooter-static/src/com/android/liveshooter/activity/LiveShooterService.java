@@ -109,22 +109,6 @@ public class LiveShooterService {
 		}
 		return true;
     }
-
-	private String execute(InputStream in) throws Exception {
-		XmlRpcClient client = new XmlRpcClient(serverUrl + ":8000/");
-		Vector<Object> params = new Vector<Object>();
-		// TBD: input video title and description from UI
-		params.add("My Video Title");
-		params.add("My Video Description");
-		VideoName = client.execute("startRecord", params).toString();
-		String urlStr = serverUrl + "/live-shooter/" + VideoName + ".html";
-		Log.i("liveshooter", "Returned playback URL is: " + urlStr);
-		if (uploadFile(IPaddr, FTPport, FTPuser, FTPpass, FTPdir, VideoName + SegmentExt, in)){
-			return urlStr;
-		} else {
-			return "";
-		}
-	}
 	
 	private void releaseMediaRecorder() {
 		if(mMediaRecorder !=null){
@@ -173,11 +157,11 @@ public class LiveShooterService {
 						fis.read(temp, 0, 8);
 						int len = Tools.bytes2int(temp, 4);
 						String type = new String(temp, 4, 4);
-						Log.i("Type", type);
-						if(len <= 0) {
-							Thread.sleep(5);
-							continue;
-						}
+						Log.i("liveshooter", "Video type is: " + type);
+						//if(len <= 0) {
+						//	Thread.sleep(0.1);
+						//	continue;
+						//}
 						if(temp[4] == 'a' && temp[5] == 'v' && temp[6] == 'c' && temp[7] == 'C'){ //find the avcC box
 							fis.skip(6);
 							fis.read(temp, 0, 2);
@@ -227,7 +211,7 @@ public class LiveShooterService {
 								}
 								offset += k;
 							}
-							Log.i("liveshooter", "h264headerlength: " + (h264length + h264head.length));
+							Log.v("liveshooter", "h264headerlength: " + (h264length + h264head.length));
 							out.write(buffer, 0, h264length + h264head.length);
 						} catch (IOException e) {
 							e.printStackTrace();
@@ -244,18 +228,22 @@ public class LiveShooterService {
 	/**
 	 * Use Thread to start Ftp transfer data for it is a block process
 	 */
-	public void startFtp(){
+	public void startVideoUpload(){
 		new Thread(){
 			public void run(){
 				try {
 					fis2 = middleReceiver.getInputStream();
-					if (execute(fis2)!=""){
-						//Todo: Post video title, description etc to SNS.	
-						//Todo: Show comment feed back. (Pop up?)
-					} else {
-						Log.e("liveshooter", "Fail to upload video stream");
-					}
+					XmlRpcClient client = new XmlRpcClient(serverUrl + ":8000/");
+					Vector<Object> params = new Vector<Object>();
+					// TBD: input video title and description from UI
+					params.add("My Video Title");
+					params.add("My Video Description");
+					VideoName = client.execute("startRecord", params).toString();
+					String urlStr = serverUrl + "/live-shooter/" + VideoName + ".html";
+					Log.i("liveshooter", "Returned playback URL is: " + urlStr);
+					uploadFile(IPaddr, FTPport, FTPuser, FTPpass, FTPdir, VideoName + SegmentExt, fis2);
 				} catch (Exception e1) {
+					Log.e("liveshooter", "Fail to upload video stream");
 					e1.printStackTrace();
 				}
 			}
