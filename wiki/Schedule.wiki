@@ -1,15 +1,15 @@
 = Mile Stone 1 =
 
 ||*Content*||*Owner*||*Start time*||*Finish time*||*Status*||
-||项目创建，wiki文档初始化，source code version control||Leon||2012/3/29||2012/3/29||Done||
-||Android app项目初始化||Arashmen||2012/4/9||2012/4/11||Done||
+||initial project pages，wiki, design doc，source code version control||Leon||2012/3/29||2012/3/29||Done||
+||Android app initialize||Arashmen||2012/4/9||2012/4/11||Done||
 ||Oauth module import||Arashmen||2012/4/12||2012/4/15||Done||
-||视频完整录制，以及本地保存，调研以及实现||Arashmen||2012/4/16||2012/4/18||Done||
+||Video record and save to local disk ||Arashmen||2012/4/16||2012/4/18||Done||
 ||Http live streaming research in android client||Arashmen||2012/4/19||2012/4/22 ||Done||
-||视频录制，即时分割视频文件||Arashmen||2012/4/22||2012/5/7  ||Done||
-||服务器视频下行到客户端播放Demo||Arashmen||2012/5/15||2012/5/20  ||Done||
-||模块初步整合||Arashmen||2012/6/11||2012/6/15 ||Done||
-||视频文件实时上传至服务器 via ftp stream||Arashmen||2012/5/20||2012/6/20||Done||
+||Split video into clips real time||Arashmen||2012/4/22||2012/5/7  ||Done||
+||Video clips upload to server demo||Arashmen||2012/5/15||2012/5/20  ||Done||
+||Integrate modules and make the app run||Arashmen||2012/6/11||2012/6/15 ||Done||
+||Upload video via ftp stream||Arashmen||2012/5/20||2012/6/20||Done||
 ||Helix server and producer setup trail||Leon||2012/4/16||2012/4/19||Done||
 ||Http live streaming docs research||Leon||2012/4/17||2012/4/20||Done||
 ||Make use of VLC (open source) codec covertion||Leon||2012/4/17||2012/4/20||Done||
@@ -21,7 +21,11 @@
 ||updateSegment and finishRecord apis||Leon||2012/6/16||2012/6/18||Done||
 ||socket multiple thread server, multiple thread client samples||Leon||2012/8/20||2012/8/31||Done||
 ||vlc stream video to http live streaming, implement with xmlrpc apis||Leon||2012/8/31||2012/9/19||Done||
-||debug client stream video(h264 problem) and fit server xmlrpc api||Leon||2012/9/19|| ||In progress||
-||User interface design and framework implement|| || || ||Waiting for owner||
+||debug client stream video(h264 problem) and fit server xmlrpc api||Leon/JP||2012/9/19||2012/11/1||Done||
+||Map UDP packet to UDP broadcast stream for better performance||Leon||2012/11/1|| ||In progress||
+||User interface design and framework implement||JP||2012/11/1|| ||In progress||
+||Sound integration problem||JP||2012/11/1|| ||In progress||
+||Video rotation problem||JP||2012/11/1|| ||In progress||
+||Optimize the client logic to lower the lag||Leon/JP||2012/11/1|| ||In progress||
 ||Post video link to SNS and retrieve comments back|| || || ||Waiting for owner||
 ||Write docs about server setup and debug env|| || || ||Waiting for owner||
