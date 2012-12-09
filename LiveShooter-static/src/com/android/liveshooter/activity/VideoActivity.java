@@ -89,14 +89,14 @@ public class VideoActivity extends Activity implements  SurfaceHolder.Callback{
         });
         bnView = findViewById(R.id.bns);
         try {
-			service = new LiveShooterService(holder);
+			service = new LiveShooterService(holder, this);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
         btn_start.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				service.startVideoRecording();  
-				service.startVideoUpload();
+				//service.startVideoUpload();
 				isControllerShow = true;
 				hideControllerDelay();
 			}
