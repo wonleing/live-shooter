@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:orientation="vertical"  
+    android:layout_width="fill_parent"  
+    android:layout_height="fill_parent"  
+    android:background="@drawable/bg"
+    >     
+    
+    
+    
+    <LinearLayout 
+        android:id="@+id/bns"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_alignParentBottom="true"
+        
+        ><Button
+            android:id="@+id/surface_btn_start"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="开始录制" />
+
+        <Button
+            android:id="@+id/surface_btn_stop"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="停止录制" />
+        
+    </LinearLayout>
+</RelativeLayout>  

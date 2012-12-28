@@ -68,6 +68,10 @@
     <string name="transfer_auth">您还未绑定该平台账户，是否现在去绑定？</string>
 	<string name="transfer_to">转发至社交网站</string>
 	
+	<string name="register"><u>注册</u></string>
+	<string name="rememberkey"><u>忘记密码?</u></string>
+	<string name="title">Social Video</string>
+	
 	<!-- TransferActivity end -->
 	
 	
