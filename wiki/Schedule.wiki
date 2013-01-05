@@ -22,10 +22,19 @@
 ||socket multiple thread server, multiple thread client samples||Leon||2012/8/20||2012/8/31||Done||
 ||vlc stream video to http live streaming, implement with xmlrpc apis||Leon||2012/8/31||2012/9/19||Done||
 ||debug client stream video(h264 problem) and fit server xmlrpc api||Leon/JP||2012/9/19||2012/11/1||Done||
-||Map UDP packet to UDP broadcast stream for better performance||Leon||2012/11/1|| ||In progress||
-||User interface design and framework implement||JP||2012/11/1|| ||In progress||
-||Sound integration problem||JP||2012/11/1|| ||In progress||
-||Video rotation problem||JP||2012/11/1|| ||In progress||
-||Optimize the client logic to lower the lag||Leon/JP||2012/11/1|| ||In progress||
-||Post video link to SNS and retrieve comments back|| || || ||Waiting for owner||
-||Write docs about server setup and debug env|| || || ||Waiting for owner||
+||Map UDP packet to UDP broadcast stream for better performance||Leon||2012/11/1|| ||Postponed||
+||User interface design and framework implement||JP||2012/11/1|| ||Postponed|
+||Sound integration problem||JP||2012/11/1|| ||Postponed||
+||Video rotation problem||JP||2012/11/1|| ||Postponed||
+||Optimize the client logic to lower the lag||Leon/JP||2012/11/1|| ||Postponed||
+||Post video link to SNS and retrieve comments back|| || || ||Postponed||
+||Write docs about server setup and debug env|| || || ||Postponed||
+
+
+= Mile Stone 2 =
+
+||*Content*||*Owner*||*Start time*||*Finish time*||*Status*||
+||Product design docs||2012/12/30||2013/1/2||Leon||Done||
+||Review and feed back the doc||2013/1/3|| ||Arashmen & JP||In progress||
+||Schedule the client works|| || ||Arashmen & JP||Waiting||
+||Re-construct the server according to new design||2013/1/5|| ||Leon||Waiting||
