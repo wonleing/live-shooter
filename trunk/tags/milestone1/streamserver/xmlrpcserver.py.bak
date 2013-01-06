@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
-import os, sys, random, optparse, logging, time, socket, thread, signal, vlc
+import os, sys, random, optparse, logging, time, socket, subprocess, thread, signal
 
 u = """./%prog -s <server_ip>\nDebug: ./%prog -s 127.0.0.1 > /dev/null 2>&1"""
 parser = optparse.OptionParser(u)
@@ -53,37 +53,34 @@ class StreamServer:
         logger.debug("genPort returns ==%s== as the udp streaming port" % port)
         return port
 
-    def _streaming(self, filename):
+    def _streaming(self, filename, port):
         infile = uploadpath + filename + ext
         outname = httpdir + filename
         exportname = exportdir + filename
         # Wait client upload stream via ftp with counter i
         i = 0
-        logger.debug("Start lag timer...")
         while i<30 and not os.path.exists(infile):
             time.sleep(0.2)
             i += 1
         if i == 30:
             logger.error("%s upload from client timout. Please check the network" % infile)
             return False
-        logger.debug("Got uploaded content in the ftp dir after %d rounds" % i)
-        time.sleep(10) # For udp stream having enough cache to map
-        lag = 0.2 * i + 10
+        time.sleep(0.2)
+        lag = 0.2*(i+1)
         logger.debug("Start to stream %s after %.1f sec" % (infile, lag))
-        ins = vlc.Instance()
-        m = ins.media_new("file://%s" % infile, "sout=#transcode{width=%d,height=%d,vcodec=h264,vb=%d,venc=x264{aud,profile=baseline,\
+        #os.system("sudo chmod 666 %s" % infile) # Make upload stream read/write-able
+        p1 = subprocess.Popen('vlc -I dummy %s --sout udp:localhost:%d' %(infile, port),\
+        stdout=None, stderr=None, shell=True, preexec_fn=os.setsid)
+        p2 = subprocess.Popen('''vlc -I dummy --sout "#transcode{width=%d,height=%d,vcodec=h264,vb=%d,venc=x264{aud,profile=baseline,\
         level=30,keyint=30,ref=1},acodec=aac,ab=%d,deinterlace}:std{access=livehttp{seglen=%d,delsegs=true,numsegs=%d,index=%s.m3u8,\
-        index-url=%s-########.ts},mux=ts{use-key-frames},dst=%s-########.ts}"
-        % (vinfo['width'], vinfo['hight'], vinfo['vbit'], vinfo['abit'], segmentlength, segnum, outname, exportname, outname))
-        #m = ins.media_new("file://%s" % infile, "sout=udp:localhost:1234")
-        p = ins.media_player_new()
-        p.set_media(m)
-        logger.debug("Init for %s streaming completed" % filename)
+        index-url=%s-########.ts},mux=ts{use-key-frames},dst=%s-########.ts}" udp://@localhost:%d vlc://quit'''
+        % (vinfo['width'], vinfo['hight'], vinfo['vbit'], vinfo['abit'], segmentlength, segnum, outname, exportname, outname, port),
+        stdout=None, stderr=None, shell=True, preexec_fn=os.setsid)
         global PDIC
-        PDIC[filename] = p
+        PDIC[filename] = (p1.pid, p2.pid)
         PDIC[filename+"_lag"] = lag
         logger.debug("current PDIC is: %s" %str(PDIC))
-        p.play()
+        return True
 
     def _createHtml(self, filename, videotitle, videodesc):
         t = open("template.html", "r")
@@ -93,10 +90,12 @@ class StreamServer:
         n.close()
         logger.debug("html page for %s created with Title %s" %(filename, videotitle))
 
-    def _cleanup(self, filename, oauth):
+    def _cleanup(self, filename, pid, oauth):
         if oauth:
             #TBD, upload original video to oauth destination
             logger.debug("video uploaded to oauth web site")
+        time.sleep(5) # Wait for M3U8 index updating
+        os.killpg(pid, signal.SIGTERM)
         time.sleep(60)
         # Delete original uploaded video files?
         os.system("rm -rf %s" % (uploadpath+filename+ext))
@@ -104,22 +103,19 @@ class StreamServer:
         logger.info("live video segments of %s completely deleted" %filename)
 
     def startRecord(self, videotitle="", videodesc=""):
-        logger.info("got connection from phone. Title:%s, Description:%s" %(videotitle, videodesc))
         self._check("/usr/bin/vlc")
         filename = self._genFilename()
-        #port = self._genPort()
-        thread.start_new_thread(self._streaming, (filename,))
-        #self._createHtml(filename, videotitle, videodesc)
-        #self._streaming("norkpmix")
-        #thread.start_new_thread(self._streaming, ("norkpmix",))
+        port = self._genPort()
+        thread.start_new_thread(self._streaming, (filename, port))
+        self._createHtml(filename, videotitle, videodesc)
         return filename
 
     def finishRecord(self, filename, oauth=None):
         global PDIC
         time.sleep(PDIC[filename+"_lag"])
-        PDIC[filename].stop()
-        logger.debug("live streaming for %s finished" % filename)
-        thread.start_new_thread(self._cleanup, (filename, oauth))
+        os.killpg(PDIC[filename][0], signal.SIGTERM)
+        logger.debug("Killed process group: %d. %s live streaming finished" %(PDIC[filename][0], filename))
+        thread.start_new_thread(self._cleanup, (filename, PDIC[filename][1], oauth))
         PDIC.pop(filename)
         PDIC.pop(filename+"_lag")
         logger.debug("current PDIC is: %s" %str(PDIC))
