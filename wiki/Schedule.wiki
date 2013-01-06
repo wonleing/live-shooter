@@ -33,13 +33,17 @@
 
 = Mile Stone 2 =
 
-||*Content*||*Owner*||*Start time*||*Finish time*||*Status*||
+||*Content*||*Start time*||*Finish time*||*Owner*||*Status*||
 ||Product design docs||2012/12/30||2013/1/2||Leon||Done||
-||Review and feed back the doc||2013/1/3|| ||Arashmen & JP||In progress||
+||Review feed back the doc and make schedule||2013/1/3||2013/1/6||Arashmen & JP||Done||
 ||Re-construct the server according to new design||2013/1/5|| ||Leon||In progress||
-||Sina Mini Blog Login ||2013/1/5||2013/1/7||Arashmen||In progress||
-||Record Video ||2013/1/8||2013/1/13||Arashmen||Waiting||
-||Upload Video ||2013/1/14||2013/1/16||Arashmen||Waiting||
-||Debug With Server ||2013/1/17||2013/1/19||Arashmen||Waiting||
-||Schedule the client works|| || || JP||Waiting||
+||[ios] Sina Mini Blog Login||2013/1/5||2013/1/7||Arashmen||In progress||
+||[ios] Record Video||2013/1/8||2013/1/13||Arashmen||Waiting||
+||[ios] Upload Video||2013/1/14||2013/1/16||Arashmen||Waiting||
+||[ios] Debug With Server ||2013/1/17||2013/1/19||Arashmen||Waiting||
+||[Android] login screen||2013/1/7||2013/1/8||JP||Waiting||
+||[Android] recording screen||2013/1/9||2013/1/12||JP||Waiting||
+||[Android] uploading screen||2013/1/13||2013/1/17||JP||Waiting||
+||[Android] play back screen||2013/1/18||2013/1/20||JP||Waiting||
+||[Android] feed screen||2013/1/21||2013/1/26||JP||Waiting||
 ||Debug and test server issue|| || ||Leon||Waiting||
