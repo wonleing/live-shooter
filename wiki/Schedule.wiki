@@ -37,5 +37,9 @@
 ||Product design docs||2012/12/30||2013/1/2||Leon||Done||
 ||Review and feed back the doc||2013/1/3|| ||Arashmen & JP||In progress||
 ||Re-construct the server according to new design||2013/1/5|| ||Leon||In progress||
-||Schedule the client works|| || ||Arashmen & JP||Waiting||
+||Sina Mini Blog Login ||2013/1/5||2013/1/7||Arashmen||In progress||
+||Record Video ||2013/1/8||2013/1/13||Arashmen||Waiting||
+||Upload Video ||2013/1/14||2013/1/16||Arashmen||Waiting||
+||Debug With Server ||2013/1/17||2013/1/19||Arashmen||Waiting||
+||Schedule the client works|| || || JP||Waiting||
 ||Debug and test server issue|| || ||Leon||Waiting||
