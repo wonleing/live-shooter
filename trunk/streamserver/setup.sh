@@ -1,9 +1,12 @@
 #!/bin/bash
 #Ubuntu server setup
-sudo apt-get install vsftpd subversion vlc
+sudo dpkg --force-depends --purge libsqlite3-0:amd64 libsqlite3-0:i386 
+apt-get download libsqlite3-0:amd64 libsqlite3-0:i386
+sudo dpkg --install libsqlite3-0*amd64.deb libsqlite3-0*i386.deb
+sudo apt-get install vsftpd subversion vlc sqlite3
 
 #Fedora server setup, install RPMFusion.org/Configuration Fusion.rpm first
-#sudo yum install vsftpd subversion vlc
+#sudo yum install vsftpd subversion vlc sqlite3
 
 sudo touch /var/log/liveshooter.log
 sudo mkdir -p /var/ftp/pub /var/www/live-shooter
@@ -45,4 +48,6 @@ sudo echo """
 /usr/sbin/nologin
 """ > /etc/shells
 
-# Then you can run ./xmlrpcserver -s <serverip>
+cat initdb.sql | sqlite3 liveshooter.db
+
+# Then you can run ./streamserver -s <serverip>
