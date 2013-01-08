@@ -1,17 +1,14 @@
 #!/bin/bash
 #Ubuntu server setup
-sudo dpkg --force-depends --purge libsqlite3-0:amd64 libsqlite3-0:i386 
-apt-get download libsqlite3-0:amd64 libsqlite3-0:i386
-sudo dpkg --install libsqlite3-0*amd64.deb libsqlite3-0*i386.deb
-sudo apt-get install vsftpd subversion vlc sqlite3
-
-#Fedora server setup, install RPMFusion.org/Configuration Fusion.rpm first
-#sudo yum install vsftpd subversion vlc sqlite3
+#sudo dpkg --force-depends --purge libsqlite3-0:amd64 libsqlite3-0:i386 
+#apt-get download libsqlite3-0:amd64 libsqlite3-0:i386
+#sudo dpkg --install libsqlite3-0*amd64.deb libsqlite3-0*i386.deb
+sudo apt-get install vsftpd subversion vlc sqlite3 openssh-server apache2
 
 sudo touch /var/log/liveshooter.log
 sudo mkdir -p /var/ftp/pub /var/www/live-shooter
-sudo chmod 777 /var/log/liveshooter.log /var/ftp/pub /var/www/live-shooter
-sudo useradd live -d /var/ftp/pub
+sudo chmod 777 /var/log/liveshooter.log /var/ftp/pub /var/www/live-shooter /etc/vsftpd.conf /etc/shells
+#sudo useradd live -d /var/ftp/pub
 #Manual work: sudo passwd live (input shooter)
 
 sudo echo """
@@ -49,5 +46,8 @@ sudo echo """
 """ > /etc/shells
 
 cat initdb.sql | sqlite3 liveshooter.db
+sudo /etc/init.d/vsftpd restart
+sudo /etc/init.d/ssh restart
+sudo /etc/init.d/apache2 restart
 
 # Then you can run ./streamserver -s <serverip>

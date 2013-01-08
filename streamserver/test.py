@@ -4,7 +4,7 @@ uname = "test@sina.com"
 usns = "sina"
 videotitle = "My first video"
 snsid = "fowqjfsadkfjaldf"
-vsample = "/home/leon/download/raiders.mp4"
+vsample = "/tmp/raiders.mp4"
 ftpdir = "/var/ftp/pub/"
 s=xmlrpclib.ServerProxy("http://127.0.0.1:8000")
 
