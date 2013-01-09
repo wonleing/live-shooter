@@ -1,12 +1,16 @@
 #!/usr/bin/python
 import xmlrpclib, os, time
+from ftplib import FTP
+
+IP = "54.248.182.51"
+ftp = FTP(IP, "live", "shooter")
 uname = "test@sina.com"
 usns = "sina"
 videotitle = "My first video"
 snsid = "fowqjfsadkfjaldf"
-vsample = "/tmp/raiders.mp4"
+vsample = "/home/leon/download/raiders.mp4"
 ftpdir = "/var/ftp/pub/"
-s=xmlrpclib.ServerProxy("http://127.0.0.1:8000")
+s=xmlrpclib.ServerProxy("http://%s:8000" %IP)
 
 userid = s.loginUser(uname, usns)
 print "create user:", userid
@@ -17,7 +21,7 @@ print "upload video file name is:", videoid
 if s.addTitle(userid, videoid, videotitle):
     print "add tiltle %s for %s" %(videotitle, videoid)
 
-os.system("cp %s %s%s.mp4" %(vsample, ftpdir, videoid))
+ftp.storbinary('%s.mp4' %videoid, open(vsample, 'rb'))
 url = s.finishUpload(videoid)
 print "Transcode completed, now you can watch %s" %url
 
