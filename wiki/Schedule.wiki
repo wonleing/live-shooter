@@ -39,6 +39,7 @@
 ||Re-construct server api and database according to new design||2013/1/5||2013/1/8||Leon||Done||
 ||Design and write server API doc||2013/1/5||2013/1/8||Leon||Done||
 ||server API unit test script||2013/1/8||2013/1/8||Leon||Done||
+||Debug and setup test server||2013/1/8||2013/1/9||Leon||Done||
 ||*ios* Sina Mini Blog Login||2013/1/5||2013/1/7||Arashmen||In progress||
 ||*ios* Record Video||2013/1/8||2013/1/13||Arashmen||Waiting||
 ||*ios* Upload Video||2013/1/14||2013/1/16||Arashmen||Waiting||
@@ -48,4 +49,3 @@
 ||*Android* uploading screen||2013/1/13||2013/1/17||JP||Waiting||
 ||*Android* play back screen||2013/1/18||2013/1/20||JP||Waiting||
 ||*Android* feed screen||2013/1/21||2013/1/26||JP||Waiting||
-||Debug and test server issue||2013/1/9|| ||Leon||In progress||
