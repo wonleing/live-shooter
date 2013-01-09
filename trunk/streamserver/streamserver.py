@@ -4,13 +4,15 @@ import os, sys, random, optparse, logging, time, lsdb
 
 u = """./%prog -s <server_ip>\nDebug: ./%prog -s 127.0.0.1 > /dev/null 2>&1"""
 parser = optparse.OptionParser(u)
-parser.add_option('-s', '--server', help='stream server ip addres', dest='serverip')
+parser.add_option('-s', '--server', help='stream server internal ip address', dest='serverip')
+parser.add_option('-p', '--public', help='public ip address', dest='publicip')
 (options, leftargs) = parser.parse_args()
 if options.serverip == None:
     parser.print_help()
     sys.exit()
-
-print "Starting service on", options.serverip
+if options.publicip == None:
+    options.publicip = options.serverip
+print "Starting service on", options.serverip, "publish with IP:", options.publicip
 server = SimpleXMLRPCServer((options.serverip, 8000))
 server.register_introspection_functions()
 
@@ -20,7 +22,7 @@ ext = ".mp4"
 vinfo = {'width':480, 'hight':360, 'vbit':700, 'abit':96}
 uploadpath = "/var/ftp/pub/"
 httpdir = "/var/www/live-shooter/"
-exportdir = "http://" + options.serverip + "/live-shooter/"
+exportdir = "http://" + options.publicip + "/live-shooter/"
 logfile = "/var/log/liveshooter.log"
 logger = logging.getLogger('Live shooter')
 hdlr = logging.FileHandler(logfile)
