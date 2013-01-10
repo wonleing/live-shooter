@@ -26,7 +26,7 @@ class DB:
 
     def addVideo(self, userid, videoid, videotitle):
         self.cu.execute("insert into uservideo (userid, videoid) values (%d, '%s')" %(userid, videoid))
-        self.cu.execute("insert into video (videoid, title, score) values ('%s', '%s', 0)" %(videoid, videotitle))
+        self.cu.execute("insert into video (videoid, title, snsid, score) values ('%s', '%s', '', 0)" %(videoid, videotitle))
         return True
 
     def shareVideo(self, videoid, snsid):

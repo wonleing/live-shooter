@@ -25,6 +25,12 @@ secure_chroot_dir=/var/run/vsftpd/empty
 pam_service_name=ftp
 rsa_cert_file=/etc/ssl/private/vsftpd.pem
 local_root=/var/ftp/pub
+pasv_enable=YES
+pasv_min_port=14000
+pasv_max_port=14050
+port_enable=YES
+pasv_address=54.248.182.51
+pasv_addr_resolve=NO
 local_umask=000""" > /etc/vsftpd.conf
 
 sudo echo """/bin/false
@@ -48,4 +54,5 @@ sudo /etc/init.d/vsftpd restart
 sudo /etc/init.d/ssh restart
 sudo /etc/init.d/apache2 restart
 
-# Then you can run ./streamserver -s <serverip>
+echo 'Start the service with pid:'
+nohup ./streamserver.py -s 10.146.27.163 -p 54.248.182.51 > /dev/null 2>&1 &
