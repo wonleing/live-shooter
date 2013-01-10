@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -94,6 +95,19 @@ public class Tools {
 	public static String currentTime(Date date){
     	return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
     }
+	
+	public static String getProjectDir(){
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/live-shooter/";
+		if(!new File(path).exists()){
+			new File(path).mkdirs();
+		}
+		return path;
+	}
+	
+	public static String getRecordVideoPath(){
+		long time = Calendar.getInstance().getTimeInMillis();
+		return getProjectDir() + time + ".mp4";
+	}
 	
 	public static void invertArray(byte[] arr){
 		int len = arr.length;
