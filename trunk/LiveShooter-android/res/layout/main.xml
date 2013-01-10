@@ -8,19 +8,20 @@
     <SurfaceView   
             android:id="@+id/surface_camera"  
             android:layout_width="fill_parent"  
-            android:layout_height="fill_parent"
-            android:layout_above="@+id/bns"  
+            android:layout_height="fill_parent"  
               
     /> 
     
-    <LinearLayout 
+    <RelativeLayout 
         android:id="@+id/bns"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:layout_alignParentBottom="true"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
         
-        ><Button
+        >
+        <!-- 
+        <Button
             android:id="@+id/surface_btn_start"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -33,6 +34,26 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="停止录制" />
+        -->
+        <ImageButton 
+	        android:id="@+id/startBn"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginRight="10dp"
+	        android:layout_alignParentRight="true"
+	        android:src="@drawable/icon_bn_start"
+	        android:contentDescription="start"/>
+	    
+	    <ImageButton 
+	        android:id="@+id/stopBn"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentRight="true"
+	        android:layout_below="@+id/startBn"
+	        android:layout_marginTop="15dp"
+	        android:layout_marginRight="10dp"
+	        android:src="@drawable/icon_bn_stop"
+	        android:contentDescription="stop"/>
         
-    </LinearLayout>
+    </RelativeLayout>
 </RelativeLayout>  
