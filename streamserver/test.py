@@ -21,7 +21,7 @@ print "upload video file name is:", videoid
 if s.addTitle(userid, videoid, videotitle):
     print "add tiltle %s for %s" %(videotitle, videoid)
 
-ftp.storbinary('%s.mp4' %videoid, open(vsample, 'rb'))
+ftp.storbinary('STOR %s.mp4' %videoid, open(vsample, 'rb'))
 url = s.finishUpload(videoid)
 print "Transcode completed, now you can watch %s" %url
 
