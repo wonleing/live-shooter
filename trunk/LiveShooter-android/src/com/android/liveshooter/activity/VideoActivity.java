@@ -12,16 +12,20 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 
-import com.android.liveshooter.R;
 
 public class VideoActivity extends Activity implements  SurfaceHolder.Callback{
 	
     boolean mMediaRecorderRecording;  
     private SurfaceView mSurfaceView;  
-    private Button btn_start;
-    private Button btn_stop;
+    
+    private SurfaceHolder holder;
+    private ImageButton btn_start;
+    private ImageButton btn_stop;
     private LiveShooterService service;
     
     private boolean isControllerShow = false;    
@@ -39,6 +43,7 @@ public class VideoActivity extends Activity implements  SurfaceHolder.Callback{
 				break;
 			}
 		}
+		
 	};
 	
 	private void hideController(){
@@ -64,12 +69,14 @@ public class VideoActivity extends Activity implements  SurfaceHolder.Callback{
     
     @Override  
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);  
+        super.onCreate(savedInstanceState);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);  
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);//隐去标题
         setContentView(R.layout.main);  
         mSurfaceView = (SurfaceView) this.findViewById(R.id.surface_camera);  
-        btn_start = (Button)this.findViewById(R.id.surface_btn_start);
-        btn_stop = (Button)this.findViewById(R.id.surface_btn_stop);
-        SurfaceHolder holder = mSurfaceView.getHolder();  
+        btn_start = (ImageButton)this.findViewById(R.id.startBn);
+        btn_stop = (ImageButton)this.findViewById(R.id.stopBn);
+        holder = mSurfaceView.getHolder();  
         holder.addCallback(this);  
         holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);  
         mSurfaceView.setVisibility(View.VISIBLE);  
@@ -119,8 +126,11 @@ public class VideoActivity extends Activity implements  SurfaceHolder.Callback{
     @Override  
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {  
     }  
+    
     @Override  
     public void surfaceCreated(SurfaceHolder holder) {  
+    	this.holder = holder;	
+		service.prepare();
     }  
     @Override  
     public void surfaceDestroyed(SurfaceHolder holder) {  

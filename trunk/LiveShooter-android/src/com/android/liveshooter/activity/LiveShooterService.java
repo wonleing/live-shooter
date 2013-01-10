@@ -123,6 +123,21 @@ public class LiveShooterService {
 		initializeVideo();
 		initializeAudio();
 	}
+	
+	public void prepare(){
+		if(mMediaRecorder != null){
+			try {
+				mMediaRecorder.setPreviewDisplay(this.holder.getSurface());
+				mMediaRecorder.prepare();
+			} catch (IllegalStateException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 
 	private boolean uploadFile(String url, String port, String username, String password, String path, String filename, InputStream input) {
 		ftp = new FTPClient();
