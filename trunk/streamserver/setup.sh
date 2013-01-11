@@ -7,8 +7,8 @@ sudo apt-get update
 sudo apt-get install vsftpd subversion vlc sqlite3 openssh-server apache2
 
 sudo touch /var/log/liveshooter.log
-sudo mkdir -p /var/ftp/pub /var/www/live-shooter
-sudo chmod 777 /var/log/liveshooter.log /var/ftp/pub /var/www/live-shooter /etc/vsftpd.conf /etc/shells
+sudo mkdir -p /var/ftp/pub /var/www
+sudo chmod 777 /var/log/liveshooter.log /var/ftp/pub /var/www /etc/vsftpd.conf /etc/shells
 #sudo useradd live -d /var/ftp/pub
 #Manual work: sudo passwd live (input shooter)
 
