@@ -5,24 +5,22 @@ import os, sys, random, optparse, logging, time, lsdb, thread
 u = """./%prog -s <server_ip>\nDebug: ./%prog -s 127.0.0.1 > /dev/null 2>&1"""
 parser = optparse.OptionParser(u)
 parser.add_option('-s', '--server', help='stream server internal ip address', dest='serverip')
-parser.add_option('-p', '--public', help='public ip address', dest='publicip')
+parser.add_option('-p', '--public', help='public DNS', dest='publicdns')
 (options, leftargs) = parser.parse_args()
 if options.serverip == None:
     parser.print_help()
     sys.exit()
-if options.publicip == None:
-    options.publicip = options.serverip
-print "Starting service on", options.serverip, "publish with IP:", options.publicip
+if options.publicdns == None:
+    options.publicdns = options.serverip
+print "Starting service on", options.serverip, "with public address:", options.publicdns
 server = SimpleXMLRPCServer((options.serverip, 8000))
 server.register_introspection_functions()
 
 segmentlength = 10
-segnum = 5
-ext = ".mp4"
-vinfo = {'width':480, 'hight':360, 'vbit':700, 'abit':96}
+segnum = 999
 uploadpath = "/var/ftp/pub/"
 httpdir = "/var/www/"
-exportdir = "http://" + options.publicip + "/"
+exportdir = "http://" + options.publicdns + "/"
 logfile = "/var/log/liveshooter.log"
 logger = logging.getLogger('Live shooter')
 hdlr = logging.FileHandler(logfile)
@@ -46,17 +44,27 @@ class StreamServer:
 
     def _cleanup(self, videoid):
         # Delete original uploaded video files?
-        os.system("rm -rf %s" % (uploadpath+videoid+ext))
+        os.system("rm -rf %s" % (uploadpath+videoid))
         logger.info("orignal uploaded video %s completely deleted" %videoid)
 
     def _streaming(self, videoid):
-        infile = uploadpath + videoid + ext
+        infile = uploadpath + videoid
         outname = httpdir + videoid + "/" + videoid
         exportname = exportdir + videoid + "/" + videoid
+        vinfo = os.popen("./midentify.sh %s" %infile).read().split("\n")
+        for k in vinfo:
+            if "WIDTH" in k:
+                width = int(k.split("=")[1])
+            if "HEIGHT" in k:
+                height = int(k.split("=")[1])
+            if "VIDEO_BITRATE" in k:
+                vbit = int(k.split("=")[1])/1000
+            if "AUDIO_BITRATE" in k:
+                abit = int(k.split("=")[1])/1000
         os.system("vlc %s --sout='#transcode{width=%d,height=%d,vcodec=h264,vb=%d,venc=x264{aud,profile=baseline,\
         level=30,keyint=30,ref=1},acodec=aac,ab=%d,deinterlace}:std{access=livehttp{seglen=%d,delsegs=true,numsegs=%d,index=%s.m3u8,\
         index-url=%s-########.ts},mux=ts{use-key-frames},dst=%s-########.ts}' vlc://quit -I dummy" \
-        % (infile, vinfo['width'], vinfo['hight'], vinfo['vbit'], vinfo['abit'], segmentlength, segnum, outname, exportname, outname))
+        % (infile, width, height, vbit, abit, segmentlength, segnum, outname, exportname, outname))
         self._cleanup(videoid)
 
     def loginUser(self, uname, usns):

@@ -4,7 +4,7 @@
 #apt-get download libsqlite3-0:amd64 libsqlite3-0:i386
 #sudo dpkg --install libsqlite3-0*amd64.deb libsqlite3-0*i386.deb
 sudo apt-get update
-sudo apt-get install vsftpd subversion vlc sqlite3 openssh-server apache2
+sudo apt-get install vsftpd subversion vlc sqlite3 openssh-server apache2 mplayer
 
 sudo touch /var/log/liveshooter.log
 sudo mkdir -p /var/ftp/pub /var/www
@@ -29,7 +29,7 @@ pasv_enable=YES
 pasv_min_port=14000
 pasv_max_port=14050
 port_enable=YES
-pasv_address=54.248.182.51
+pasv_address=liveshooter.cn.mu
 pasv_addr_resolve=NO
 local_umask=000""" > /etc/vsftpd.conf
 
@@ -55,4 +55,4 @@ sudo /etc/init.d/ssh restart
 sudo /etc/init.d/apache2 restart
 
 echo 'Start the service with pid:'
-nohup ./streamserver.py -s 10.146.27.163 -p 54.248.182.51 > /dev/null 2>&1 &
+nohup ./streamserver.py -s 10.146.27.163 -p liveshooter.cn.mu > /dev/null 2>&1 &
