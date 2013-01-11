@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from SimpleXMLRPCServer import SimpleXMLRPCServer
-import os, sys, random, optparse, logging, time, lsdb
+import os, sys, random, optparse, logging, time, lsdb, thread
 
 u = """./%prog -s <server_ip>\nDebug: ./%prog -s 127.0.0.1 > /dev/null 2>&1"""
 parser = optparse.OptionParser(u)
@@ -21,8 +21,8 @@ segnum = 5
 ext = ".mp4"
 vinfo = {'width':480, 'hight':360, 'vbit':700, 'abit':96}
 uploadpath = "/var/ftp/pub/"
-httpdir = "/var/www/live-shooter/"
-exportdir = "http://" + options.publicip + "/live-shooter/"
+httpdir = "/var/www/"
+exportdir = "http://" + options.publicip + "/"
 logfile = "/var/log/liveshooter.log"
 logger = logging.getLogger('Live shooter')
 hdlr = logging.FileHandler(logfile)
@@ -37,7 +37,8 @@ class StreamServer:
         
     def _createHtml(self, videoid):
         t = open("template.html", "r")
-        n = open(httpdir+videoid+".html", "w")
+        os.mkdir(httpdir+videoid)
+        n = open(httpdir+videoid+"/index.html", "w")
         n.write(t.read().replace("FileName", videoid))
         t.close()
         n.close()
@@ -47,6 +48,16 @@ class StreamServer:
         # Delete original uploaded video files?
         os.system("rm -rf %s" % (uploadpath+videoid+ext))
         logger.info("orignal uploaded video %s completely deleted" %videoid)
+
+    def _streaming(self, videoid):
+        infile = uploadpath + videoid + ext
+        outname = httpdir + videoid + "/" + videoid
+        exportname = exportdir + videoid + "/" + videoid
+        os.system("vlc %s --sout='#transcode{width=%d,height=%d,vcodec=h264,vb=%d,venc=x264{aud,profile=baseline,\
+        level=30,keyint=30,ref=1},acodec=aac,ab=%d,deinterlace}:std{access=livehttp{seglen=%d,delsegs=true,numsegs=%d,index=%s.m3u8,\
+        index-url=%s-########.ts},mux=ts{use-key-frames},dst=%s-########.ts}' vlc://quit -I dummy" \
+        % (infile, vinfo['width'], vinfo['hight'], vinfo['vbit'], vinfo['abit'], segmentlength, segnum, outname, exportname, outname))
+        self._cleanup(videoid)
 
     def loginUser(self, uname, usns):
         ret = self.db.selectUserID(uname, usns)
@@ -71,20 +82,13 @@ class StreamServer:
 
     def finishUpload(self, videoid):
         logger.debug("upload completed, start to covert %s into HLS" % videoid)
-        infile = uploadpath + videoid + ext
-        outname = httpdir + videoid
-        exportname = exportdir + videoid
+        self._createHtml(videoid)
         try:
-            os.system("vlc %s --sout='#transcode{width=%d,height=%d,vcodec=h264,vb=%d,venc=x264{aud,profile=baseline,\
-            level=30,keyint=30,ref=1},acodec=aac,ab=%d,deinterlace}:std{access=livehttp{seglen=%d,delsegs=true,numsegs=%d,index=%s.m3u8,\
-            index-url=%s-########.ts},mux=ts{use-key-frames},dst=%s-########.ts}' vlc://quit -I dummy" \
-            % (infile, vinfo['width'], vinfo['hight'], vinfo['vbit'], vinfo['abit'], segmentlength, segnum, outname, exportname, outname))
+            thread.start_new_thread(self._streaming, (videoid,))
         except:
             return False
-        logger.debug("Transcode from %s to HLS completed" % infile)
-        self._createHtml(videoid)
-        self._cleanup(videoid)
-        return exportname + ".html"
+        logger.debug("Transcode for %s to HLS completed" % videoid)
+        return exportdir + videoid
 
     def shareVideo(self, videoid, snsid): 
         logger.debug("video %s published on sns web with id: %s" % (videoid, snsid))
