@@ -40,12 +40,21 @@
 ||Design and write server API doc||2013/1/5||2013/1/8||Leon||Done||
 ||server API unit test script||2013/1/8||2013/1/8||Leon||Done||
 ||Debug and setup test server||2013/1/8||2013/1/9||Leon||Done||
-||*ios* Sina Mini Blog Login||2013/1/5||2013/1/7||Arashmen||In progress||
-||*ios* Record Video||2013/1/8||2013/1/13||Arashmen||Waiting||
-||*ios* Upload Video||2013/1/14||2013/1/16||Arashmen||Waiting||
-||*ios* Debug With Server ||2013/1/17||2013/1/19||Arashmen||Waiting||
-||*Android* login screen||2013/1/7||2013/1/8||JP||Waiting||
-||*Android* recording screen||2013/1/9||2013/1/12||JP||Waiting||
-||*Android* uploading screen||2013/1/13||2013/1/17||JP||Waiting||
-||*Android* play back screen||2013/1/18||2013/1/20||JP||Waiting||
-||*Android* feed screen||2013/1/21||2013/1/26||JP||Waiting||
+||add nickname and photo||2013/1/10||2013/1/20||Leon||Done||
+||return json instead of python list||2013/1/10||2013/1/20||Leon||Done||
+||api: follow, unfollow,(via uid and vid) like, unlike, user_profile||2013/1/10||2013/1/20||Leon||Done||
+||snap video first pic||2013/1/19||2013/1/21||Leon||Done||
+||message(via user and video) module design and implement|| || || ||Wait||
+||_ios_ Sina Mini Blog Login||2013/1/5||2013/1/7||Arashmen||In progress||
+||_ios_ Record Video ||2013/1/8||2013/1/13||Arashmen||Waiting||
+||_ios_ Upload Video||2013/1/14||2013/1/16||Arashmen||Waiting||
+||_ios_ Debug With Server ||2013/1/17||2013/1/19||Arashmen||Waiting||
+||_Android_ login screen||2013/1/7||2013/1/8||JP||Done||
+||_Android_ recording screen||2013/1/9||2013/1/12||JP||Done||
+||_Android_ feed screen||2013/1/21||2013/1/26||JP||Done||
+||_Android_ uploading screen||2013/1/13||2013/1/17||JP||In progress||
+||_Android_ play back screen||2013/1/18||2013/1/20||JP||In progress||
+||_Android_ share screen||2013/1/19|| ||JP||In progress||
+||_Android_ top video, friend and recommandation page||2013/1/19|| ||JP||In progress||
+||_Android_ .mp4, audio, sns login, sns publish, comment||2013/1/19|| ||JP||In progress||
+||_Android_ video comment, share, flash and landscape record|| || ||JP||Wait||
