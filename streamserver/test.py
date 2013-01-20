@@ -1,18 +1,20 @@
 #!/usr/bin/python
-import xmlrpclib, os, time
+import xmlrpclib, os
 from ftplib import FTP
 
 IP = "liveshooter.cn.mu"
 ftp = FTP(IP, "live", "shooter")
 uname = "test@sina.com"
 usns = "sina"
+nickname = "DemonLeon"
+icon = "http://tp4.sinaimg.cn/1435494115/180/5613100011/1"
 videotitle = "My first video"
 snsid = "fowqjfsadkfjaldf"
 vsample = "/home/leon/download/raiders.mp4"
 ftpdir = "/var/ftp/pub/"
 s=xmlrpclib.ServerProxy("http://%s:8000" %IP)
 
-userid = s.loginUser(uname, usns)
+userid = s.loginUser(uname, usns, nickname, icon)
 print "create user:", userid
 
 videoid = s.genFilename()
@@ -31,15 +33,34 @@ if s.shareVideo(videoid, snsid):
 if s.likeVideo(userid, videoid):
     print "user", userid, "liked video", videoid
 
-ul = s.getFollowing(userid)
-print "user", userid, "following these users:", str(ul)
+if s.followUser(1, 1):
+    print "user 1 followed himself"
 
-ul = s.getFollower(userid)
-print "user", userid, "is followed by these users:", str(ul)
+ul = s.getFollowing(1)
+print "user 1 following these users:", str(ul)
+
+if s.followVideo(userid, 'inittest'):
+    print "user", userid, "followed the owner of video inittest"
+
+ul = s.getFollower(1)
+print "user 1 is followed by these users:", str(ul)
+
+if s.unfollowUser(1, 1):
+    print "user 1 unfollowed himself"
+
+if s.unfollowVideo(userid, 'inittest'):
+    print "user", userid, "unfollowed the owner of video inittest"
+
+up = s.getUserProfile(userid)
+print "retrieved user", userid, "profile", str(up)
 
 vl = s.getUserVideo(userid)
 print "user", userid, "has uploaded following video", str(vl)
 
 vl = s.getFeed(userid)
 print "user", userid, "feed list is:", str(vl)
+
+if s.unlikeVideo(userid, videoid):
+    print "user", userid, "unliked video", videoid
+
 print "API testing finished!"

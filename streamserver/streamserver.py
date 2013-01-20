@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from SimpleXMLRPCServer import SimpleXMLRPCServer
-import os, sys, random, optparse, logging, time, lsdb, thread
+import os, sys, random, optparse, logging, time, lsdb, thread, json
 
 u = """./%prog -s <server_ip>\nDebug: ./%prog -s 127.0.0.1 > /dev/null 2>&1"""
 parser = optparse.OptionParser(u)
@@ -51,7 +51,7 @@ class StreamServer:
         infile = uploadpath + videoid
         outname = httpdir + videoid + "/" + videoid
         exportname = exportdir + videoid + "/" + videoid
-        vinfo = os.popen("./midentify.sh %s" %infile).read().split("\n")
+        vinfo = os.popen("./midentify.sh %s" %infile).readlines()
         for k in vinfo:
             if "WIDTH" in k:
                 width = int(k.split("=")[1])
@@ -61,24 +61,28 @@ class StreamServer:
                 vbit = int(k.split("=")[1])/1000
             if "AUDIO_BITRATE" in k:
                 abit = int(k.split("=")[1])/1000
+        logger.debug("video height: %d, width: %d, vbit: %d, abit: %d" %(width, height, vbit, abit))
         os.system("vlc %s --sout='#transcode{width=%d,height=%d,vcodec=h264,vb=%d,venc=x264{aud,profile=baseline,\
         level=30,keyint=30,ref=1},acodec=aac,ab=%d,deinterlace}:std{access=livehttp{seglen=%d,delsegs=true,numsegs=%d,index=%s.m3u8,\
         index-url=%s-########.ts},mux=ts{use-key-frames},dst=%s-########.ts}' vlc://quit -I dummy" \
         % (infile, width, height, vbit, abit, segmentlength, segnum, outname, exportname, outname))
+        logger.debug("Transcode for %s to HLS completed" % infile)
         self._cleanup(videoid)
 
-    def loginUser(self, uname, usns):
+    def loginUser(self, uname, usns, nickname, uicon):
         ret = self.db.selectUserID(uname, usns)
         if not ret:
-            logger.info("User %s at %s is 1st time of using our app" %(uname, usns))
-            ret = self.db.createUser(uname, usns)
-        logger.info("User %d logged in" %ret)
+            ret = self.db.createUser(uname, usns, nickname, uicon)
+            logger.info("User %s at %s is 1st time of using our app, created userid %d" %(uname, usns, ret))
+        else:
+            self.db.updateUser(ret, nickname, uicon)
+            logger.info("User %s at %s already has userid %d, updated its nickname and icon" %(uname, usns, ret))
         return ret
 
     def genFilename(self):
         logger.info("start to upload client video file to server ftp")
         rand = "".join(random.sample('zyxwvutsrqponmlkjihgfedcba',8))
-        if os.path.exists(uploadpath + rand):
+        if os.path.exists( httpdir + rand):
             logger.debug("random filename already existed, genFilename again!")
             self._genFilename()
         logger.debug("genFilename returns ==%s== as the file name" % rand)
@@ -95,7 +99,6 @@ class StreamServer:
             thread.start_new_thread(self._streaming, (videoid,))
         except:
             return False
-        logger.debug("Transcode for %s to HLS completed" % videoid)
         return exportdir + videoid
 
     def shareVideo(self, videoid, snsid): 
@@ -104,12 +107,29 @@ class StreamServer:
 
     def likeVideo(self, userid, videoid):
         logger.debug("user %d like video %s, try add feed and score" % (userid, videoid))
-        if self.db.likeVideo(userid, videoid):
-            logger.debug("feed added, score added")
-            return True
-        else:
-            logger.debug("already liked before, wont add feed or score")
-            return False
+        return self.db.likeVideo(userid, videoid)
+
+    def unlikeVideo(self, userid, videoid):
+        logger.debug("user %d unlike video %s, remove feed and score" % (userid, videoid))
+        return self.db.unlikeVideo(userid, videoid)
+
+    def followUser(self, userid, targetid):
+        logger.debug("user %d followed user %d" %(userid, targetid))
+        return self.db.followUser(userid, targetid)
+
+    def followVideo(self, userid, videoid):
+        logger.debug("user %d followed the owner of video %s" %(userid, videoid))
+        targetid = self.db.getVideoUser(videoid)
+        return self.db.followUser(userid, targetid)
+
+    def unfollowUser(self, userid, targetid):
+        logger.debug("user %d unfollowed user %d" %(userid, targetid))
+        return self.db.unfollowUser(userid, targetid)
+
+    def unfollowVideo(self, userid, videoid):
+        logger.debug("user %d unfollowed the owner of video %s" %(userid, videoid))
+        targetid = self.db.getVideoUser(videoid)
+        return self.db.unfollowUser(userid, targetid)
 
     def getFollowing(self, userid):
         ul = ()
@@ -125,16 +145,23 @@ class StreamServer:
         logger.debug("%d follower list is: %s" % (userid, str(ul)))
         return ul
 
-    def getUserVideo(self, userid):
-        # returned format is: [(vid, vtitle, snsid, score, createdate),(...)...]
-        return self.db.getUserVideo(userid)
+    def getUserProfile(self, targetid):
+        logger.debug("retrieving user %d's profile" %targetid)
+        return json.dumps(self.db.getUserProfile(targetid))
+
+    def getUserVideo(self, userid, nojson=False):
+        logger.debug("retrieving user %d's video list" %userid)
+        ret = self.db.getUserVideo(userid)
+        if nojson:
+            return ret
+        return json.dumps(ret)
 
     def getFeed(self, userid):
         fl = self.db.getLikeVideo(userid)
         for u in self.getFollowing(userid):
-            fl += self.getUserVideo(u)
+            fl += self.getUserVideo(u, nojson=True)
         logger.debug("%d feed list is %s" % (userid, str(fl)))
-        return fl
+        return json.dumps(fl)
 
 
 # Run the server's main loop
