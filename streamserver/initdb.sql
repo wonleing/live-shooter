@@ -32,7 +32,7 @@ userid int,
 following int,
 primary key (userid, following));
 
-insert into users (username, nickname, icon, sns, type) values ("wonleing@sina.com", "DemonLeon", "", "sina", "pay");
+insert into users (username, nickname, icon, sns, type) values ("wonleing@sina.com", "DemonLeon", "", "sina", "admin");
 insert into uservideo (userid, videoid) values (1, "inittest");
 insert into video (videoid, title, snsid, score) values ("inittest", "This is a test", "23asdfoiajdsf", 0);
 insert into userlike (userid, videoid) values (2, "inittest");
