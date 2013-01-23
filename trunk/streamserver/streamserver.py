@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from SimpleXMLRPCServer import SimpleXMLRPCServer
-import os, sys, random, optparse, logging, time, lsdb, thread, json
+import os, sys, random, optparse, logging, time, lsdb, thread, json, datetime
 
 u = """./%prog -s <server_ip>\nDebug: ./%prog -s 127.0.0.1 > /dev/null 2>&1"""
 parser = optparse.OptionParser(u)
@@ -32,6 +32,13 @@ logger.setLevel(logging.DEBUG)
 class StreamServer:
     def __init__(self):
         self.db = lsdb.DB()
+
+    def _adminchk(self, adminid, operation):
+        if self.db.getUserProfile(adminid)[5] != 'admin':
+            logger.warning("user %d tries to do admin work: %s" % (adminid, operation))
+            return False
+        logger.warning("admin %d did admin work: %s" % (adminid, operation))
+        return True
         
     def _createHtml(self, videoid):
         t = open("template.html", "r")
@@ -62,6 +69,9 @@ class StreamServer:
             if "AUDIO_BITRATE" in k:
                 abit = int(k.split("=")[1])/1000
         logger.debug("video height: %d, width: %d, vbit: %d, abit: %d" %(width, height, vbit, abit))
+        os.system("vlc -I dummy --video-filter=scene --vout=dummy --no-audio --scene-ratio=120 --start-time=1 --stop-time=2 \
+        --scene-path=%s --scene-prefix=%s --scene-format=jpeg --scene-replace %s vlc://quit &>/dev/null" \
+        % (httpdir+videoid+"/", videoid, infile))
         os.system("vlc %s --sout='#transcode{width=%d,height=%d,vcodec=h264,vb=%d,venc=x264{aud,profile=baseline,\
         level=30,keyint=30,ref=1},acodec=aac,ab=%d,deinterlace}:std{access=livehttp{seglen=%d,delsegs=true,numsegs=%d,index=%s.m3u8,\
         index-url=%s-########.ts},mux=ts{use-key-frames},dst=%s-########.ts}' vlc://quit -I dummy" \
@@ -80,7 +90,6 @@ class StreamServer:
         return ret
 
     def genFilename(self):
-        logger.info("start to upload client video file to server ftp")
         rand = "".join(random.sample('zyxwvutsrqponmlkjihgfedcba',8))
         if os.path.exists( httpdir + rand):
             logger.debug("random filename already existed, genFilename again!")
@@ -132,17 +141,17 @@ class StreamServer:
         return self.db.unfollowUser(userid, targetid)
 
     def getFollowing(self, userid):
+        logger.debug("get user %d following list" %userid)
         ul = ()
         for u in self.db.getFollowing(userid):
             ul += u
-        logger.debug("%d following list is: %s" % (userid, str(ul)))
         return ul
 
     def getFollower(self, userid):
+        logger.debug("get user %d follower list" %userid)
         ul = ()
         for u in self.db.getFollower(userid):
             ul += u
-        logger.debug("%d follower list is: %s" % (userid, str(ul)))
         return ul
 
     def getUserProfile(self, targetid):
@@ -152,16 +161,33 @@ class StreamServer:
     def getUserVideo(self, userid, nojson=False):
         logger.debug("retrieving user %d's video list" %userid)
         ret = self.db.getUserVideo(userid)
-        if nojson:
-            return ret
         return json.dumps(ret)
 
     def getFeed(self, userid):
-        fl = self.db.getLikeVideo(userid)
-        for u in self.getFollowing(userid):
-            fl += self.getUserVideo(u, nojson=True)
-        logger.debug("%d feed list is %s" % (userid, str(fl)))
+        logger.debug("return feed list of user %d" %userid)
+        fl = self.db.getFeed(userid)
         return json.dumps(fl)
+
+    def getRecommandUser(self):
+        logger.debug("return top 1 admin, top 50 business, top 50 confirmed, top 50 free users")
+        ru = self.db.getTopUser('admin', 1)
+        ru += self.db.getTopUser('business', 50)
+        ru += self.db.getTopUser('confirmed', 50)
+        ru += self.db.getTopUser('free', 50)
+        return json.dumps(ru)
+
+    def getRecommandVideo(self):
+        logger.debug("return top 100 video of this week")
+        d = datetime.timedelta(days=7)
+        return json.dumps(self.db.getTopVideo(datetime.date.today()-d))
+
+    def changeUserType(self, adminid, userid, type):
+        if self._adminchk(adminid, "change user %d type to %s" %(userid, type)):
+            return self.db.changeUserType(userid, type)
+
+    def deleteVideo(self, adminid, videoid):
+        if self._adminchk(adminid, "delete video %s" % videoid):
+            return self.db.deleteVideo(videoid) 
 
 
 # Run the server's main loop

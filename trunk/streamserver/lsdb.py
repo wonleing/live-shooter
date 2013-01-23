@@ -84,7 +84,8 @@ class DB:
         return self.cu.fetchall()[0][0]
 
     def getUserVideo(self, userid):
-        self.cu.execute("select v.* from video as v,uservideo as uv where uv.videoid=v.videoid and uv.userid=%d" %userid)
+        self.cu.execute("select v.* from video as v,uservideo as uv where uv.videoid=v.videoid and uv.userid=%d \
+        order by createdate desc limit 100" %userid)
         return self.cu.fetchall()
 
     def getUserProfile(self, userid):
@@ -92,7 +93,8 @@ class DB:
         return self.cu.fetchall()[0]
 
     def getLikeVideo(self, userid):
-        self.cu.execute("select v.* from video as v,userlike as ul where ul.videoid=v.videoid and ul.userid=%d" %userid)
+        self.cu.execute("select v.* from video as v,userlike as ul where ul.videoid=v.videoid and ul.userid=%d \
+        order by createdate desc limit 100" %userid)
         return self.cu.fetchall()
 
     def getFollowing(self, userid):
@@ -102,4 +104,29 @@ class DB:
     def getFollower(self, userid):
         self.cu.execute("select userid from followship where following=%d" %userid)
         return self.cu.fetchall()
+
+    def getFeed(self, userid):
+        self.cu.execute("select v.* from video as v,userlike as ul where ul.videoid=v.videoid and ul.userid=%d union \
+        select v.* from video as v,uservideo as uv where uv.videoid=v.videoid and uv.userid in \
+        (select following from followship where userid=%d) order by createdate desc limit 100" %(userid, userid))
+        return self.cu.fetchall()
+
+    def getTopUser(self, type, num):
+        self.cu.execute("select following, count(*) from followship where following in (select userid from users where type='%s') \
+        group by following order by count(*) desc limit %d" %(type, num))
+        return self.cu.fetchall()
+
+    def getTopVideo(self, date):
+        self.cu.execute("select * from video where createdate>'%s' order by score desc limit 100" %date)
+        return self.cu.fetchall()
+
+    def changeUserType(self, userid, type):
+        self.cu.execute("update users set type='%s' where userid=%d" %(type, userid))
+        self.cx.commit()
+        return True
+
+    def deleteVideo(self, videoid):
+        self.cu.execute("delete from video where videoid='%s'" %videoid)
+        self.cx.commit()
+        return True
 
