@@ -44,6 +44,8 @@
 ||return json instead of python list||2013/1/10||2013/1/20||Leon||Done||
 ||api: follow, unfollow,(via uid and vid) like, unlike, user_profile||2013/1/10||2013/1/20||Leon||Done||
 ||snap video first pic||2013/1/19||2013/1/21||Leon||Done||
+||add recommand user/video, change user type, delete video apis||2013/1/21||2013/1/23||Leon||Done||
+||sort returned video list, define user types and admin works||2013/1/21||2013/1/23||Leon||Done||
 ||message(via user and video) module design and implement|| || || ||Wait||
 ||_ios_ Sina Mini Blog Login||2013/1/5||2013/1/7||Arashmen||In progress||
 ||_ios_ Record Video ||2013/1/8||2013/1/13||Arashmen||Waiting||
