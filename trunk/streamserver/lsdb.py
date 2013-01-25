@@ -1,8 +1,14 @@
-import sqlite3
+DB_type = 'mysql'
 
 class DB:
     def __init__(self):
-        self.cx = sqlite3.connect("./liveshooter.db")
+        try:
+            DB_type == 'mysql'
+            import MySQLdb
+            self.cx = MySQLdb.connect('localhost', 'live', 'shooter@123', 'liveshooter')
+        except:
+            import sqlite3
+            self.cx = sqlite3.connect("./liveshooter.db")
         self.cu = self.cx.cursor()
 
     def __del__(self):
@@ -127,6 +133,8 @@ class DB:
 
     def deleteVideo(self, videoid):
         self.cu.execute("delete from video where videoid='%s'" %videoid)
+        self.cu.execute("delete from userlike where videoid='%s'" %videoid)
+        self.cu.execute("delete from uservideo where videoid='%s'" %videoid)
         self.cx.commit()
         return True
 

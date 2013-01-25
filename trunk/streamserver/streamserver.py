@@ -29,6 +29,12 @@ hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
 logger.setLevel(logging.DEBUG)
 
+class TimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        return json.JSONEncoder.default(self, obj)
+
 class StreamServer:
     def __init__(self):
         self.db = lsdb.DB()
@@ -161,12 +167,12 @@ class StreamServer:
     def getUserVideo(self, userid, nojson=False):
         logger.debug("retrieving user %d's video list" %userid)
         ret = self.db.getUserVideo(userid)
-        return json.dumps(ret)
+        return json.dumps(ret, cls=TimeEncoder)
 
     def getFeed(self, userid):
         logger.debug("return feed list of user %d" %userid)
         fl = self.db.getFeed(userid)
-        return json.dumps(fl)
+        return json.dumps(fl, cls=TimeEncoder)
 
     def getRecommandUser(self):
         logger.debug("return top 1 admin, top 50 business, top 50 confirmed, top 50 free users")
@@ -179,7 +185,8 @@ class StreamServer:
     def getRecommandVideo(self):
         logger.debug("return top 100 video of this week")
         d = datetime.timedelta(days=7)
-        return json.dumps(self.db.getTopVideo(datetime.date.today()-d))
+        ret = self.db.getTopVideo(datetime.date.today()-d)
+        return json.dumps(ret, cls=TimeEncoder)
 
     def changeUserType(self, adminid, userid, type):
         if self._adminchk(adminid, "change user %d type to %s" %(userid, type)):
@@ -187,6 +194,7 @@ class StreamServer:
 
     def deleteVideo(self, adminid, videoid):
         if self._adminchk(adminid, "delete video %s" % videoid):
+            os.system("rm -rf %s" % (httpdir+videoid))
             return self.db.deleteVideo(videoid) 
 
 
