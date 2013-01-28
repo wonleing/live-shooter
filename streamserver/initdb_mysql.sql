@@ -16,7 +16,7 @@ videoid varchar(8) primary key,
 title varchar(300),
 snsid varchar(50),
 score int,
-createdate TIMESTAMP DEFAULT (datetime('now','localtime')));
+createdate TIMESTAMP DEFAULT localtime);
 
 create table userlike(
 userid int,
