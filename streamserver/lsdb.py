@@ -18,7 +18,7 @@ class DB:
             pass
 
     def selectUserID(self, uname, usns):
-        self.cu.execute("select userid from users where username='%s' and sns='%s'" %(uname, usns))
+        self.cu.execute("select userid from user where username='%s' and sns='%s'" %(uname, usns))
         ret = self.cu.fetchall()
         if ret:
             return ret[0][0]
@@ -27,7 +27,7 @@ class DB:
     def createUser(self, uname, usns, nickname, icon):
         # All new created users are free, change user type with modifyUser
         try:
-            self.cu.execute("insert into users (username, sns, type, nickname, icon) values ('%s', '%s', 'free', '%s', '%s')" \
+            self.cu.execute("insert into user (username, sns, type, nickname, icon) values ('%s', '%s', 'free', '%s', '%s')" \
             %(uname, usns, nickname, icon))
             self.cx.commit()
         except:
@@ -35,7 +35,7 @@ class DB:
         return self.selectUserID(uname, usns)
 
     def updateUser(self, userid, nickname, icon):
-        self.cu.execute("update users set nickname='%s', icon='%s' where userid=%d" %(nickname, icon, userid))
+        self.cu.execute("update user set nickname='%s', icon='%s' where userid=%d" %(nickname, icon, userid))
         self.cx.commit()
         return True
 
@@ -95,7 +95,7 @@ class DB:
         return self.cu.fetchall()
 
     def getUserProfile(self, userid):
-        self.cu.execute("select * from users where userid=%d" %userid)
+        self.cu.execute("select * from user where userid=%d" %userid)
         return self.cu.fetchall()[0]
 
     def getLikeVideo(self, userid):
@@ -118,7 +118,7 @@ class DB:
         return self.cu.fetchall()
 
     def getTopUser(self, type, num):
-        self.cu.execute("select following, count(*) from followship where following in (select userid from users where type='%s') \
+        self.cu.execute("select following, count(*) from followship where following in (select userid from user where type='%s') \
         group by following order by count(*) desc limit %d" %(type, num))
         return self.cu.fetchall()
 
@@ -127,7 +127,7 @@ class DB:
         return self.cu.fetchall()
 
     def changeUserType(self, userid, type):
-        self.cu.execute("update users set type='%s' where userid=%d" %(type, userid))
+        self.cu.execute("update user set type='%s' where userid=%d" %(type, userid))
         self.cx.commit()
         return True
 
