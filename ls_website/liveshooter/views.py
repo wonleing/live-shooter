@@ -3,7 +3,7 @@ from django.conf import settings
 from django.http import Http404
 from liveshooter.models import Followship, Userlike, User, Uservideo, Video
 import xmlrpclib
-s=xmlrpclib.ServerProxy("%s:8000" %settings.MEDIA_URL)
+s=xmlrpclib.ServerProxy("%s:8000" %settings.XMLRPC_URL)
 
 def index(request):
     recommand_users = s.getRecommandUser(True)
