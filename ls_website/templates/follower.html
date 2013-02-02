@@ -1,0 +1,13 @@
+{% include "header.html" %}
+{% if follower_list %}
+    <h4><img src="{{ up.3 }}" title="{{ up.2 }}" height="100" width="100"/> {{ up.2 }} is followed by:</h4>
+    <ul>
+    {% for fer in follower_list %}
+        <a href="../../user/{{ fer.0 }}">
+        <img src="{{ fer.3 }}" title="{{ fer.2 }}" height="42" width="42" /> {{ fer.2 }}</a>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>{{ up.2 }} is not followed by any one yet.</p>
+{% endif %}
+{% include "footer.html" %}

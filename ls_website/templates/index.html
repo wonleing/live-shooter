@@ -1,0 +1,29 @@
+{% include "header.html" %}
+{% if recommand_users %}
+    <h4>Most popular users</h4>
+    <ul>
+    {% for ru in recommand_users %}
+        <a href="/user/{{ ru.0 }}">
+        <img src="{{ ru.3 }}" title="{{ ru.2 }}" height="42" width="42"/>{{ ru.2 }}</a>
+        &emsp;followers:<b>{{ ru.6 }}</b></br>
+    {% endfor %}
+    </ul>  
+{% else %}
+    <p>No recommand users are available.</p>
+{% endif %}
+
+{% if recommand_videos %}
+    <h4>Most popular videos of this week</h4>
+    <ul>
+    {% for rv in recommand_videos %}
+        <a href="{{ MEDIA_URL }}/{{ rv.0 }}">
+        <img src="{{ MEDIA_URL }}/{{ rv.0 }}/{{ rv.0 }}.jpeg" height="120" width="160" /></a>
+        &emsp;Score:<b>{{ rv.3 }}</b>&emsp;Title:{{ rv.1 }}&emsp;Upload time:{{ rv.4 }}&emsp;Uploaded by:
+        <a href="/user/{{ rv.5 }}">
+        <img src="{{ rv.8 }}" title="{{ rv.7 }}" height="24" width="24"/>{{ rv.7 }}</a></br>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No recommand videos are available.</p>
+{% endif %}
+{% include "footer.html" %}
