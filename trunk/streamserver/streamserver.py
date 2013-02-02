@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from SimpleXMLRPCServer import SimpleXMLRPCServer
-import os, sys, random, optparse, logging, time, lsdb, thread, json, datetime
+import os, sys, random, string, optparse, logging, time, lsdb, thread, json, datetime
 
 u = """./%prog -s <server_ip>\nDebug: ./%prog -s 127.0.0.1 > /dev/null 2>&1"""
 parser = optparse.OptionParser(u)
@@ -38,19 +38,12 @@ class TimeEncoder(json.JSONEncoder):
 class StreamServer:
     def __init__(self):
         self.db = lsdb.DB()
-
-    def _adminchk(self, adminid, operation):
-        if self.db.getUserProfile(adminid)[5] != 'admin':
-            logger.warning("user %d tries to do admin work: %s" % (adminid, operation))
-            return False
-        logger.warning("admin %d did admin work: %s" % (adminid, operation))
-        return True
         
     def _createHtml(self, videoid):
         t = open("template.html", "r")
         os.mkdir(httpdir+videoid)
         n = open(httpdir+videoid+"/index.html", "w")
-        n.write(t.read().replace("FileName", videoid))
+        n.write(t.read().replace("FileName", videoid).replace("BASEURL", options.publicdns))
         t.close()
         n.close()
         logger.debug("html page for %s created" %videoid)
@@ -96,7 +89,7 @@ class StreamServer:
         return ret
 
     def genFilename(self):
-        rand = "".join(random.sample('zyxwvutsrqponmlkjihgfedcba',8))
+        rand = "".join(random.sample(string.ascii_letters+string.digits, 8))
         if os.path.exists( httpdir + rand):
             logger.debug("random filename already existed, genFilename again!")
             self._genFilename()
@@ -146,57 +139,60 @@ class StreamServer:
         targetid = self.db.getVideoUser(videoid)
         return self.db.unfollowUser(userid, targetid)
 
-    def getFollowing(self, userid):
+    def getFollowing(self, userid, nojson=False):
         logger.debug("get user %d following list" %userid)
-        ul = ()
-        for u in self.db.getFollowing(userid):
-            ul += u
-        return ul
+        ret = self.db.getFollowing(userid)
+        if nojson:
+            return ret
+        return json.dumps(ret)
 
-    def getFollower(self, userid):
+    def getFollower(self, userid, nojson=False):
         logger.debug("get user %d follower list" %userid)
-        ul = ()
-        for u in self.db.getFollower(userid):
-            ul += u
-        return ul
+        ret = self.db.getFollower(userid)
+        if nojson:
+            return ret
+        return json.dumps(ret)
 
-    def getUserProfile(self, targetid):
+    def getUserProfile(self, targetid, nojson=False):
         logger.debug("retrieving user %d's profile" %targetid)
-        return json.dumps(self.db.getUserProfile(targetid))
+        follower_no = len(self.db.getFollower(targetid))
+        following_no = len(self.db.getFollowing(targetid))
+        ret = self.db.getUserProfile(targetid) + (follower_no, following_no)
+        if nojson:
+            return ret
+        return json.dumps(ret)
 
     def getUserVideo(self, userid, nojson=False):
         logger.debug("retrieving user %d's video list" %userid)
         ret = self.db.getUserVideo(userid)
+        if nojson:
+            return ret
         return json.dumps(ret, cls=TimeEncoder)
 
-    def getFeed(self, userid):
+    def getFeed(self, userid, nojson=False):
         logger.debug("return feed list of user %d" %userid)
         fl = self.db.getFeed(userid)
+        if nojson:
+            return fl
         return json.dumps(fl, cls=TimeEncoder)
 
-    def getRecommandUser(self):
+    def getRecommandUser(self, nojson=False):
         logger.debug("return top 1 admin, top 50 business, top 50 confirmed, top 50 free users")
         ru = self.db.getTopUser('admin', 1)
         ru += self.db.getTopUser('business', 50)
         ru += self.db.getTopUser('confirmed', 50)
         ru += self.db.getTopUser('free', 50)
+        if nojson:
+            return ru
         return json.dumps(ru)
 
-    def getRecommandVideo(self):
+    def getRecommandVideo(self, nojson=False):
         logger.debug("return top 100 video of this week")
         d = datetime.timedelta(days=7)
         ret = self.db.getTopVideo(datetime.date.today()-d)
+        if nojson:
+            return ret
         return json.dumps(ret, cls=TimeEncoder)
-
-    def changeUserType(self, adminid, userid, type):
-        if self._adminchk(adminid, "change user %d type to %s" %(userid, type)):
-            return self.db.changeUserType(userid, type)
-
-    def deleteVideo(self, adminid, videoid):
-        if self._adminchk(adminid, "delete video %s" % videoid):
-            os.system("rm -rf %s" % (httpdir+videoid))
-            return self.db.deleteVideo(videoid) 
-
 
 # Run the server's main loop
 server.register_instance(StreamServer())
