@@ -69,10 +69,4 @@ print "user", userid, "feed list is:", str(vl)
 if s.unlikeVideo(userid, videoid):
     print "user", userid, "unliked video", videoid
 
-if s.changeUserType(1, userid, 'business'):
-    print "Admin 1 changed user", userid, "type to business"
-
-#if s.deleteVideo(1, videoid):
-#    print "Admin 1 deleted video", videoid
-
 print "API testing finished!"

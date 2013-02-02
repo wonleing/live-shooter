@@ -113,10 +113,11 @@ class DB:
         return self.cu.fetchall()
 
     def getFeed(self, userid):
+        #mysql has a bug, cannot order by createdate here
         self.cu.execute("select v.*, u.* from video as v, userlike as ul, user as u, uservideo as uv where ul.userid=%d and \
         ul.videoid=v.videoid and uv.videoid=v.videoid and u.userid=uv.userid union \
         select v.*, u.* from video as v, uservideo as uv, user as u where uv.videoid=v.videoid and u.userid=uv.userid and uv.userid in \
-        (select following from followship where userid=%d) order by v.createdate desc limit 100" %(userid, userid))
+        (select following from followship where userid=%d) limit 100" %(userid, userid))
         return self.cu.fetchall()
 
     def getTopUser(self, type, num):
