@@ -1,0 +1,22 @@
+{% include "header.html" %}
+{% if up %}
+    <h4><img src="{{ up.3 }}" title="{{ up.2 }}" height="100" width="100"/>{{ up.2 }}</h4>
+    <ul>Type:<i>{{ up.5 }}</i>&emsp;SNS platform:<i>{{ up.4 }}</i>&emsp;Follower:<a href="/follower/{{ up.0 }}">{{ up.6 }}</a>
+    &emsp;Following:<a href="/following/{{ up.0 }}">{{ up.7 }}</a></ul>
+{% else %}
+    <p>No user profile found.</p>
+{% endif %}
+
+{% if user_videos %}
+    <h4>Videos uploaded by <b>{{ up.2 }}</b></h4>
+    <ul>
+    {% for uv in user_videos %}
+        <a href="{{ MEDIA_URL }}/{{ uv.0 }}">
+        <img src="{{ MEDIA_URL }}/{{ uv.0 }}/{{ uv.0 }}.jpeg" height="120" width="160" /></a>
+        &emsp;Score:<b>{{ uv.3 }}</b>&emsp;Title:<i>{{ uv.1 }}</i>&emsp;Upload time:<i>{{ uv.4 }}</i></br>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>{{ up.2 }} hasn't uploaded any videos yet.</p>
+{% endif %}
+{% include "footer.html" %}
