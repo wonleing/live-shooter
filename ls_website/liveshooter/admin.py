@@ -46,9 +46,9 @@ class VideocheckAdmin(admin.ModelAdmin):
         uv.delete()
         vc.delete()
         try:
-            ul = Userlike.objects.get(videoid=obj.videoid)
+            ul = Userlike.objects.filter(videoid=obj.videoid)
             ul.delete()
-        except:
+        except DoesNotExist:
             pass
         os.system("rm -rf %s%s" %(settings.MEDIA_ROOT, obj.videoid))
     def play_link(self, obj):
