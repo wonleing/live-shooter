@@ -18,6 +18,7 @@ server.register_introspection_functions()
 
 segmentlength = 10
 segnum = 999
+ext = ".mp4"
 uploadpath = "/var/ftp/pub/"
 httpdir = "/var/www/"
 exportdir = "http://" + options.publicdns + "/"
@@ -43,20 +44,17 @@ class StreamServer:
         t = open("template.html", "r")
         os.mkdir(httpdir+videoid)
         n = open(httpdir+videoid+"/index.html", "w")
-        n.write(t.read().replace("FileName", videoid).replace("BASEURL", options.publicdns))
+        n.write(t.read().replace("FileName", videoid))
         t.close()
         n.close()
         logger.debug("html page for %s created" %videoid)
 
-    def _cleanup(self, videoid):
-        # Delete original uploaded video files?
-        os.system("rm -rf %s" % (uploadpath+videoid))
-        logger.info("orignal uploaded video %s completely deleted" %videoid)
-
     def _streaming(self, videoid):
-        infile = uploadpath + videoid
+        origfile = uploadpath + videoid
         outname = httpdir + videoid + "/" + videoid
+        infile = outname + ext
         exportname = exportdir + videoid + "/" + videoid
+        os.system("mv %s %s" %(origfile, infile))
         vinfo = os.popen("./midentify.sh %s" %infile).readlines()
         for k in vinfo:
             if "WIDTH" in k:
@@ -76,7 +74,6 @@ class StreamServer:
         index-url=%s-########.ts},mux=ts{use-key-frames},dst=%s-########.ts}' vlc://quit -I dummy" \
         % (infile, width, height, vbit, abit, segmentlength, segnum, outname, exportname, outname))
         logger.debug("Transcode for %s to HLS completed" % infile)
-        self._cleanup(videoid)
 
     def loginUser(self, uname, usns, nickname, uicon):
         ret = self.db.selectUserID(uname, usns)
@@ -122,12 +119,18 @@ class StreamServer:
         return self.db.unlikeVideo(userid, videoid)
 
     def followUser(self, userid, targetid):
+        if userid == targetid:
+            logger.warning("invalid operation - %d follow himself" %userid)
+            return False
         logger.debug("user %d followed user %d" %(userid, targetid))
         return self.db.followUser(userid, targetid)
 
     def followVideo(self, userid, videoid):
         logger.debug("user %d followed the owner of video %s" %(userid, videoid))
         targetid = self.db.getVideoUser(videoid)
+        if userid == targetid:
+            logger.warning("invalid operation - %d follow himself" %userid)
+            return False
         return self.db.followUser(userid, targetid)
 
     def unfollowUser(self, userid, targetid):
@@ -137,7 +140,8 @@ class StreamServer:
     def unfollowVideo(self, userid, videoid):
         logger.debug("user %d unfollowed the owner of video %s" %(userid, videoid))
         targetid = self.db.getVideoUser(videoid)
-        return self.db.unfollowUser(userid, targetid)
+        if targetid:
+            return self.db.unfollowUser(userid, targetid)
 
     def getFollowing(self, userid, nojson=False):
         logger.debug("get user %d following list" %userid)

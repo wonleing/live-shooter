@@ -72,7 +72,7 @@ STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # Additional locations of static files
-STATICFILES_DIRS = ("/home/leon/work/ls_website/static/",)
+STATICFILES_DIRS = ("/home/leon/ls_website/static/",)
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -103,7 +103,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'ls_website.urls'
 
 TEMPLATE_DIRS = (
-    "/home/leon/work/ls_website/templates"
+    "/home/leon/ls_website/templates"
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )

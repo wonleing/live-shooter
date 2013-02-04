@@ -1,12 +1,22 @@
 <html>
   <head>
     <title>Live shooter - Record and share your own video easily!</title>
-    <meta name="viewport" content="width=480; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="viewport" content="width=800; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <script src="../jwplayer/jwplayer.js"></script>
+    <script>jwplayer.key="Y/yp6D/PqY3MWODtAsgLoDWr8ExJZw+hsWZ84w=="</script>
   </head>
   <body>
-    <center>
-      <video width='480' height='360' src="FileName.m3u8" controls autoplay />
-    </center>
-  <p align="center">Android 2.x or lower smart phone and non-safari PC browser please play this <a href="http://BASEURL/FileName/FileName.m3u8">m3u8 file</a> with VLC or other supported media player.</p>
+    <div align="center">
+      <p>Http Live Streaming for Iphone, Ipad, MAC and Android3+</p>
+      <center><video width='480' height='270' src="FileName.m3u8" controls autoplay /></center>
+      <p align="center">Android 2.x or lower smart phone and non-safari PC browser please play this:</p>
+      <div id="myElement" style="text-align:center; vertical-align:middle;">Loading the player...</div>
+      <script type="text/javascript" align="center">
+        jwplayer("myElement").setup({
+          file: "/FileName/FileName.mp4",
+          image: "/FileName/FileName.jpeg",
+        });
+      </script>
+    </div>
   </body>
 </html>
