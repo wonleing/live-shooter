@@ -1,5 +1,5 @@
 #!/bin/bash
-pkill manage.py
+pkill -P `ps aux | grep manage.py | head -1 | awk {'print $2'}`
 mv settings.py settings.py.bak
 svn up
 mv settings.py.bak settings.py

@@ -2,7 +2,7 @@
 import xmlrpclib, os
 from ftplib import FTP
 
-IP = "liveshooter.cn.mu"
+IP = "127.0.0.1"
 ftp = FTP(IP, "live", "shooter")
 uname = "cacino@twiter.com"
 usns = uname.split('@')[1].split('.')[0]
@@ -10,7 +10,7 @@ nickname = "QiQi"
 icon = "http://tp4.sinaimg.cn/1293220651/50/1263886532/0"
 videotitle = "Ipod instruction"
 snsid = "SNSID_OF_THIS_VIDEO"
-vsample = "/home/leon/download/sample_mpeg4.mp4"
+vsample = "/home/leon/download/sample_iPod.m4v"
 ftpdir = "/var/ftp/pub/"
 s=xmlrpclib.ServerProxy("http://%s:8000" %IP)
 
@@ -24,7 +24,7 @@ $tl wonleing@sina.com DemonLeon http://tp4.sinaimg.cn/1435494115/180/5613100011/
 $tl test@163.com Babe http://tp3.sinaimg.cn/1686872410/50/5651977239/0 /home/leon/download/smile.flv
 $tl abcd@tencent.com Bigbong http://tp2.sinaimg.cn/2558350057/50/5632921435/1 /home/leon/download/Venice-h264.3gp
 '''
-#os.system(shell_command)
+os.system(shell_command)
 ################################
 
 userid = s.loginUser(uname, usns, nickname, icon)
