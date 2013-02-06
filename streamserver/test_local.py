@@ -1,16 +1,17 @@
 #!/usr/bin/python
+#coding=utf-8
 import xmlrpclib, os
 from ftplib import FTP
 
 IP = "127.0.0.1"
 ftp = FTP(IP, "live", "shooter")
-uname = "cacino@twiter.com"
+uname = "cacino@sina.com"
 usns = uname.split('@')[1].split('.')[0]
-nickname = "QiQi"
+nickname = "嘚嘚迷糊阁"
 icon = "http://tp4.sinaimg.cn/1293220651/50/1263886532/0"
-videotitle = "Ipod instruction"
+videotitle = "Small sample mpeg4 video"
 snsid = "SNSID_OF_THIS_VIDEO"
-vsample = "/home/leon/download/sample_iPod.m4v"
+vsample = "/home/leon/download/sample_mpeg4.m4v"
 ftpdir = "/var/ftp/pub/"
 s=xmlrpclib.ServerProxy("http://%s:8000" %IP)
 
@@ -81,5 +82,8 @@ print "user", userid, "feed list is:", str(vl)
 
 if s.unlikeVideo(userid, videoid):
     print "user", userid, "unliked video", videoid
+
+fl = s.getSNSfollowing('DemonLeon', 'sina')
+print "DemonLeon have following sina friends in our site", fl
 
 print "API testing finished!"

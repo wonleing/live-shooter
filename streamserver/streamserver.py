@@ -1,6 +1,7 @@
 #!/usr/bin/python
+#coding=utf-8
 from SimpleXMLRPCServer import SimpleXMLRPCServer
-import os, sys, random, string, optparse, logging, time, lsdb, thread, json, datetime
+import os, sys, random, string, optparse, logging, time, lsdb, thread, json, datetime, urllib2
 
 u = """./%prog -s <server_ip>\nDebug: ./%prog -s 127.0.0.1 > /dev/null 2>&1"""
 parser = optparse.OptionParser(u)
@@ -29,6 +30,7 @@ formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
 logger.setLevel(logging.DEBUG)
+sina_friend_url = 'https://api.weibo.com/2/friendships/friends.json?screen_name=%s&access_token=2.00taLJZBUj6VFBef805927ebBSuBKE'
 
 class TimeEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -37,9 +39,7 @@ class TimeEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 class StreamServer:
-    def __init__(self):
-        self.db = lsdb.DB()
-        
+
     def _createHtml(self, videoid):
         t = open("template.html", "r")
         os.mkdir(httpdir+videoid)
@@ -76,12 +76,13 @@ class StreamServer:
         logger.debug("Transcode for %s to HLS completed" % infile)
 
     def loginUser(self, uname, usns, nickname, uicon):
-        ret = self.db.selectUserID(uname, usns)
+        db = lsdb.DB()
+        ret = db.selectUserID(uname, usns)
         if not ret:
-            ret = self.db.createUser(uname, usns, nickname, uicon)
+            ret = db.createUser(uname, usns, nickname, uicon)
             logger.info("User %s at %s is 1st time of using our app, created userid %d" %(uname, usns, ret))
         else:
-            self.db.updateUser(ret, nickname, uicon)
+            db.updateUser(ret, nickname, uicon)
             logger.info("User %s at %s already has userid %d, updated its nickname and icon" %(uname, usns, ret))
         return ret
 
@@ -95,7 +96,8 @@ class StreamServer:
 
     def addTitle(self, userid, videoid, videotitle=""):
         logger.debug("user %d add title %s to video %s" %(userid, videotitle, videoid))
-        return self.db.addVideo(userid, videoid, videotitle)
+        db = lsdb.DB()
+        return db.addVideo(userid, videoid, videotitle)
 
     def finishUpload(self, videoid):
         logger.debug("upload completed, start to covert %s into HLS" % videoid)
@@ -108,84 +110,97 @@ class StreamServer:
 
     def shareVideo(self, videoid, snsid): 
         logger.debug("video %s published on sns web with id: %s" % (videoid, snsid))
-        return self.db.shareVideo(videoid, snsid)
+        db = lsdb.DB()
+        return db.shareVideo(videoid, snsid)
 
     def likeVideo(self, userid, videoid):
         logger.debug("user %d like video %s, try add feed and score" % (userid, videoid))
-        return self.db.likeVideo(userid, videoid)
+        db = lsdb.DB()
+        return db.likeVideo(userid, videoid)
 
     def unlikeVideo(self, userid, videoid):
         logger.debug("user %d unlike video %s, remove feed and score" % (userid, videoid))
-        return self.db.unlikeVideo(userid, videoid)
+        db = lsdb.DB()
+        return db.unlikeVideo(userid, videoid)
 
     def followUser(self, userid, targetid):
         if userid == targetid:
             logger.warning("invalid operation - %d follow himself" %userid)
             return False
         logger.debug("user %d followed user %d" %(userid, targetid))
-        return self.db.followUser(userid, targetid)
+        db = lsdb.DB()
+        return db.followUser(userid, targetid)
 
     def followVideo(self, userid, videoid):
         logger.debug("user %d followed the owner of video %s" %(userid, videoid))
-        targetid = self.db.getVideoUser(videoid)
+        db = lsdb.DB()
+        targetid = db.getVideoUser(videoid)
         if userid == targetid:
             logger.warning("invalid operation - %d follow himself" %userid)
             return False
-        return self.db.followUser(userid, targetid)
+        return db.followUser(userid, targetid)
 
     def unfollowUser(self, userid, targetid):
         logger.debug("user %d unfollowed user %d" %(userid, targetid))
-        return self.db.unfollowUser(userid, targetid)
+        db = lsdb.DB()
+        return db.unfollowUser(userid, targetid)
 
     def unfollowVideo(self, userid, videoid):
         logger.debug("user %d unfollowed the owner of video %s" %(userid, videoid))
-        targetid = self.db.getVideoUser(videoid)
+        db = lsdb.DB()
+        targetid = db.getVideoUser(videoid)
         if targetid:
-            return self.db.unfollowUser(userid, targetid)
+            return db.unfollowUser(userid, targetid)
 
     def getFollowing(self, userid, nojson=False):
         logger.debug("get user %d following list" %userid)
-        ret = self.db.getFollowing(userid)
+        db = lsdb.DB()
+        ret = db.getFollowing(userid)
         if nojson:
             return ret
         return json.dumps(ret)
 
     def getFollower(self, userid, nojson=False):
         logger.debug("get user %d follower list" %userid)
-        ret = self.db.getFollower(userid)
+        db = lsdb.DB()
+        ret = db.getFollower(userid)
         if nojson:
             return ret
         return json.dumps(ret)
 
     def getUserProfile(self, targetid, nojson=False):
         logger.debug("retrieving user %d's profile" %targetid)
-        follower_no = len(self.db.getFollower(targetid))
-        following_no = len(self.db.getFollowing(targetid))
-        ret = self.db.getUserProfile(targetid) + (follower_no, following_no)
+        db = lsdb.DB()
+        follower_no = len(db.getFollower(targetid))
+        following_no = len(db.getFollowing(targetid))
+        ret = db.getUserProfile(targetid) + (follower_no, following_no)
         if nojson:
             return ret
         return json.dumps(ret)
 
     def getUserVideo(self, userid, nojson=False):
         logger.debug("retrieving user %d's video list" %userid)
-        ret = self.db.getUserVideo(userid)
+        db = lsdb.DB()
+        ret = db.getUserVideo(userid)
         if nojson:
             return ret
         return json.dumps(ret, cls=TimeEncoder)
 
     def getFeed(self, userid, nojson=False):
         logger.debug("return feed list of user %d" %userid)
-        fl = self.db.getFeed(userid)
+        db = lsdb.DB()
+        fl = db.getFeed(userid)
         if nojson:
             return fl
         return json.dumps(fl, cls=TimeEncoder)
 
     def getRecommandUser(self, nojson=False):
         logger.debug("return top 1 admin, top 50 business, top 50 confirmed, top 50 free users")
-        ru = self.db.getTopUser('admin', 1)
-        ru += self.db.getTopUser('business', 50)
-        ru += self.db.getTopUser('confirmed', 50)
-        ru += self.db.getTopUser('free', 50)
+        db = lsdb.DB()
+        ru = db.getTopUser('admin', 1)
+        ru += db.getTopUser('business', 50)
+        ru += db.getTopUser('confirmed', 50)
+        ru += db.getTopUser('free', 50)
         if nojson:
             return ru
         return json.dumps(ru)
@@ -193,10 +208,25 @@ class StreamServer:
     def getRecommandVideo(self, nojson=False):
         logger.debug("return top 100 video of this week")
         d = datetime.timedelta(days=7)
-        ret = self.db.getTopVideo(datetime.date.today()-d)
+        db = lsdb.DB()
+        ret = db.getTopVideo(datetime.date.today()-d)
         if nojson:
             return ret
         return json.dumps(ret, cls=TimeEncoder)
+
+    def getSNSfollowing(self, screen_name, usns, nojson=False):
+        users = json.load(urllib2.urlopen(sina_friend_url %screen_name))['users']
+        db = lsdb.DB()
+        ret = []
+        for u in users:
+            profile = db.selectUserByNickname(u['screen_name'], usns)
+            if profile:
+                logger.debug("found user %d for %s's friends at %s" %(profile[0], screen_name, usns))
+                ret.append(profile)
+        if nojson:
+            return ret
+        return json.dumps(ret)
+
 
 # Run the server's main loop
 server.register_instance(StreamServer())
