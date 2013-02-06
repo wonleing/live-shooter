@@ -39,16 +39,12 @@ class VideocheckAdmin(admin.ModelAdmin):
         obj.operator = request.user.username
         obj.save()
     def delete_model(self, request, obj):
-        v = Video.objects.get(videoid=obj.videoid)
-        uv = Uservideo.objects.get(videoid=obj.videoid)
-        vc = Videocheck.objects.get(videoid=obj.videoid)
-        v.delete()
-        uv.delete()
-        vc.delete()
         try:
-            ul = Userlike.objects.filter(videoid=obj.videoid)
-            ul.delete()
-        except DoesNotExist:
+            Video.objects.get(videoid=obj.videoid).delete()
+            Uservideo.objects.get(videoid=obj.videoid).delete()
+            Videocheck.objects.get(videoid=obj.videoid).delete()
+            Userlike.objects.filter(videoid=obj.videoid).delete()
+        except:
             pass
         os.system("rm -rf %s%s" %(settings.MEDIA_ROOT, obj.videoid))
     def play_link(self, obj):
