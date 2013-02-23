@@ -12,16 +12,18 @@ import datetime
 from django.conf import settings
 
 class Followship(models.Model):
-    userid = models.IntegerField("user ID", null=True, primary_key=True, blank=True)
-    following = models.IntegerField("user been followed", null=True, primary_key=True, blank=True)
+    seq = models.IntegerField(primary_key=True)
+    userid = models.IntegerField("user ID")
+    following = models.IntegerField("user been followed")
     class Meta:
         db_table = u'followship'
     def __unicode__(self):
         return str(self.userid) + "-" + str(self.following)
 
 class Userlike(models.Model):
-    userid = models.IntegerField("user ID", null=True, primary_key=True, blank=True)
-    videoid = models.CharField("like this video", max_length=8, primary_key=True, blank=True)
+    seq = models.IntegerField(primary_key=True)
+    userid = models.IntegerField("user ID")
+    videoid = models.CharField("like this video", max_length=8)
     class Meta:
         db_table = u'userlike'
     def __unicode__(self):
@@ -29,7 +31,7 @@ class Userlike(models.Model):
 
 class User(models.Model):
     type_choice = (('admin','admin'), ('business','business'), ('confirmed','confirmed'), ('expired','expired'), ('free','free'))
-    userid = models.IntegerField("user ID", null=True, primary_key=True, blank=True)
+    userid = models.IntegerField("user ID", primary_key=True)
     username = models.CharField("user sns login name", max_length=50, blank=True)
     nickname = models.CharField("user nickname on sns site", max_length=50, blank=True)
     icon = models.URLField("user sns icon link", max_length=200, blank=True)
@@ -41,8 +43,8 @@ class User(models.Model):
         return str(self.userid)
 
 class Uservideo(models.Model):
-    userid = models.IntegerField("user ID", null=True, blank=True)
-    videoid = models.CharField("published this video", max_length=8, primary_key=True, blank=True)
+    userid = models.IntegerField("user ID", blank=True)
+    videoid = models.CharField("published this video", max_length=8, primary_key=True)
     class Meta:
         db_table = u'uservideo'
     def __unicode__(self):
@@ -51,7 +53,7 @@ class Uservideo(models.Model):
 class Video(models.Model):
     def was_published_today(self):
         return self.createdate.date() == datetime.date.today()
-    videoid = models.CharField("video ID", max_length=8, primary_key=True, blank=True)
+    videoid = models.CharField("video ID", max_length=8, primary_key=True)
     title = models.CharField("video description published on sns", max_length=300, blank=True)
     snsid = models.CharField("publish ID on that sns site", max_length=50, blank=True)
     score = models.IntegerField("times of being liked", null=True, blank=True)
@@ -63,7 +65,7 @@ class Video(models.Model):
 
 class Videocheck(models.Model):
     status_choice = (('new','new'), ('checked','checked'))
-    videoid = models.CharField("video ID", max_length=8, primary_key=True, blank=True)
+    videoid = models.CharField("video ID", max_length=8, primary_key=True)
     status = models.CharField("video status", max_length=10, choices=status_choice, default='new', blank=False)
     operator = models.CharField("last operator", max_length=20, blank=True)
     def publish_time(self):
