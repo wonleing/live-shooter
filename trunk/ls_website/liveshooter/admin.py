@@ -6,12 +6,12 @@ import os
 class FollowshipAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
-    readonly_fields = ['userid', 'following']
+    readonly_fields = ['seq', 'userid', 'following']
 
 class UserlikeAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
-    readonly_fields = ['userid', 'videoid']
+    readonly_fields = ['seq', 'userid', 'videoid']
 
 class UserAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
@@ -49,7 +49,7 @@ class VideocheckAdmin(admin.ModelAdmin):
         os.system("rm -rf %s%s" %(settings.MEDIA_ROOT, obj.videoid))
     def play_link(self, obj):
         short_description = 'Play it now'
-        return '<a href="%s/%s" target="_blank">play now</a>' % (settings.MEDIA_URL, obj.videoid)
+        return '<a href="%s%s" target="_blank">play now</a>' % (settings.MEDIA_URL, obj.videoid)
     play_link.allow_tags = True
     def make_checked(self, request, queryset):
         rows_updated = queryset.update(status='checked', operator=request.user.username)

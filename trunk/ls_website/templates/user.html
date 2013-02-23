@@ -11,8 +11,8 @@
     <h4>Videos uploaded by <b>{{ up.2 }}</b></h4>
     <ul>
     {% for uv in user_videos %}
-        <a href="{{ MEDIA_URL }}/{{ uv.0 }}">
-        <img src="{{ MEDIA_URL }}/{{ uv.0 }}/{{ uv.0 }}.jpeg" height="120" width="160" /></a>
+        <a href="{{ MEDIA_URL }}{{ uv.0 }}">
+        <img src="{{ MEDIA_URL }}{{ uv.0 }}/{{ uv.0 }}.jpeg" height="120" width="160" /></a>
         &emsp;Score:<b>{{ uv.3 }}</b>&emsp;Title:<i>{{ uv.1 }}</i>&emsp;Upload time:<i>{{ uv.4 }}</i></br>
     {% endfor %}
     </ul>
