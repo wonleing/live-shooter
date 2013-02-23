@@ -22,15 +22,15 @@ createdate datetime default (datetime('now','localtime')));
 
 drop table userlike;
 create table userlike(
+seq INTEGER PRIMARY KEY AUTOINCREMENT,
 userid int,
-videoid varchar(8),
-primary key (userid, videoid));
+videoid varchar(8));
 
 drop table followship;
 create table followship(
+seq INTEGER PRIMARY KEY AUTOINCREMENT,
 userid int,
-following int,
-primary key (userid, following));
+following int);
 
 drop table videocheck;
 create table videocheck(
