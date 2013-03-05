@@ -1,6 +1,9 @@
 package com.android.liveshooter.activity;
 
+import java.io.File;
+
 import android.app.Activity;
+import android.content.Intent;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
+import com.android.liveshooter.socket.XMLRPCServer;
 import com.android.liveshooter.util.RecorderPreview;
 import com.android.liveshooter.util.Tools;
 
@@ -32,8 +36,11 @@ public class VideoViewActivity extends Activity implements OnClickListener{
 	
 	private ImageButton stopBn;
 	
-	private boolean isControllerShow = false;    
+	private boolean isControllerShow = false;   
+	
     private View bnView;
+    
+    private String storeVideo = null;
   
     private final static int TIME = 6868; 
 	
@@ -106,12 +113,19 @@ public class VideoViewActivity extends Activity implements OnClickListener{
 		else {
 			videorecorder.reset();
 		}
+		//配置视频
 		videorecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA); //
 		videorecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
 		videorecorder.setVideoSize(videoWidth, videoHeight); //
 		videorecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264); //
 		videorecorder.setVideoFrameRate(videoFrame); //
-		videorecorder.setOutputFile(Tools.getRecordVideoPath());		
+		//配置音频
+		videorecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+		//videorecorder.setAudioChannels(2);
+		videorecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+		
+		storeVideo = Tools.getRecordVideoPath();
+		videorecorder.setOutputFile(storeVideo);		
 		
 		FrameLayout preview = (FrameLayout)findViewById(R.id.imageView);
 		recorderView = new RecorderPreview(this, videorecorder);
@@ -142,7 +156,20 @@ public class VideoViewActivity extends Activity implements OnClickListener{
 		if(videorecorder != null){
 			videorecorder.stop();
 		}
+		//生成文件名
+		String url = this.getResources().getString(R.string.rpcurl);
+		String videoname = new XMLRPCServer(url).getFileName();
+		String dir = new File(storeVideo).getParent();
+		String newpath = dir + "/" + videoname; //上传文件不需要mp4后缀
+		new File(storeVideo).renameTo(new File(newpath));
 		//开始上传视频文件
+//		UploadDialog dialog = new UploadDialog(this, newpath);
+//		dialog.show();
+		Intent intent = new Intent(this, UploadActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putString("path", newpath);
+		intent.putExtras(bundle);
+		startActivity(intent);
 	}
 
 	@Override
