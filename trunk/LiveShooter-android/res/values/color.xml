@@ -4,6 +4,10 @@
 	<drawable name="white">#FFFFFFFF</drawable>
 	<drawable name="red">#FFE31818</drawable>
 	<drawable name="gray">#FF8B8B8B</drawable>
-	<drawable name="transprent">#00000000</drawable>
+	
 	<drawable name="orange">#FFFF7E00</drawable>
+	<color name="control_back">#AA00003D</color>
+	
+	<color name="transparent">#00000000</color>
+	<color name="text_num_gray">#333</color>
 </resources>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:id="@+id/feedlayout"
+	android:layout_width="fill_parent"  
+	android:layout_height="fill_parent"  
+	android:background="#404040" 
+	>  
+
+    <TextView 
+	    android:id="@+id/ftitle"
+	    android:layout_width="fill_parent"
+	    android:layout_height="60px"
+	    android:gravity="center"
+	    android:text="Feed"
+	    android:textSize="28px"
+	    android:textStyle="bold"
+	    android:background="#585858"
+	    android:textColor="#ffffff"/>
+    
+    <ImageView
+	    android:id="@+id/refreshicon"
+	    android:layout_width="wrap_content"
+	    android:layout_height="45px"
+	    android:layout_marginTop="8px"
+	    android:src="@drawable/refresh"
+	    android:layout_marginRight="15px"
+	    android:background="@drawable/effect"
+	    android:layout_alignParentRight="true"/>
+    
+	<ListView 
+	    android:id="@+id/feeds"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@+id/ftitle"
+	    android:divider="#C8C8C8"
+	    android:dividerHeight="2px"
+	    android:background="#ffffff"
+	    android:cacheColorHint="#00000000"
+	    />
+
+</RelativeLayout>

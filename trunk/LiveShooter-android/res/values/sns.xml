@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="sns">
+	    <item>sina</item>
+	</string-array>
+	
+	<string-array name="appkeys">
+	    <item>997501600</item>
+	</string-array>
+	
+	<string-array name="appsecret">
+	    <item>f236cdb4c1fbc8d243ab580c115ac9e1</item>
+	</string-array>
+	
+	<string-array name="redirect_urls">
+	    <item>http://liveshooter.cn.mn/weibo_auth/callback.php</item>
+	</string-array>
+</resources>

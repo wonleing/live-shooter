@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<RelativeLayout  
+android:layout_width="fill_parent"  
+android:layout_height="wrap_content"  
+android:background="#E0E0E0"
+xmlns:android="http://schemas.android.com/apk/res/android"  
+>  
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="fill_parent"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:padding="5dp"
+        android:textColor="#000000"
+        android:background="#AEC9FF"
+        android:text="视频上传"
+        android:textSize="22dp"
+        />
+    
+    <RelativeLayout 
+        android:id="@+id/videolayout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/label"
+        >
+        
+        <ImageView 
+            android:id="@+id/videobg"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:src="@drawable/itembg"/>
+       
+	    <ImageButton
+		    android:id="@+id/play"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:src="@drawable/icon_play"
+		    android:background="@drawable/effect"
+		    android:layout_centerHorizontal="true"
+		    android:layout_centerVertical="true"
+		    />
+    
+    </RelativeLayout>
+    
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/progress"
+        android:text="Upload Pregress"
+        android:textSize="20dp"
+        android:textColor="#000000"/>
+    
+    <ProgressBar 
+        android:id="@+id/progress"
+        android:layout_width="fill_parent"
+        android:layout_height="35dp"
+        android:layout_margin="5dp"
+        android:indeterminate="true"
+        android:background="#FFFFFF"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_above="@+id/videotitle"/>	
+        
+    <EditText 
+        android:id="@+id/videotitle"
+        android:layout_width="fill_parent"
+        android:layout_height="80dp"
+        android:hint="Add Video Title"
+        android:layout_above="@+id/bns"/>
+    
+    <LinearLayout 
+    	android:id="@+id/bns"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:gravity="center"
+	    android:layout_alignParentBottom="true">
+	    
+	   <Button
+		    android:id="@+id/cancelBn"
+		    android:layout_width="105px"
+		    android:layout_height="wrap_content"
+		    android:layout_toLeftOf="@+id/order"
+		    android:layout_weight="1.0"
+		    android:text="取消"
+		    android:textSize="20dp" />
+		
+		<Button
+		    android:id="@+id/nextBn"
+		    android:layout_width="105px"
+		    android:layout_height="wrap_content"
+		    android:layout_toRightOf="@+id/notice_back"
+		    android:layout_weight="1.0"
+		    android:text="下一步" 
+		    android:textSize="20dp"/>
+	</LinearLayout>
+</RelativeLayout>
