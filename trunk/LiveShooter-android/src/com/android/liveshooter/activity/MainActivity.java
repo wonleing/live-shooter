@@ -29,7 +29,7 @@ public class MainActivity extends TabActivity {
         
         setupTabHost();
         
-        Intent intent = new Intent(this, MovieAllActivity.class);
+        Intent intent = new Intent(this, FeedActivity.class);
         setupTab(new TextView(this), "Feed", R.drawable.movies_all, intent);
         
         Intent intent1 = new Intent(this, MovieYourActivity.class);

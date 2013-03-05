@@ -222,4 +222,36 @@ public class Tools {
         } 
         return b; 
     } 
+	
+	public static List<String> parseMultiItemString(String str){
+		if(str == null || str.length() == 0){
+			return null;
+		}
+		int i = 0, start = 0;
+		boolean ok = false;
+		List<String> result = new ArrayList<String>();
+		while(i < str.length()){
+			if(str.charAt(i) == '['){
+				if(ok == false){
+					ok = true;
+					start = i;
+				}
+			}
+			if(str.charAt(i) == ']'){
+				if(ok == true){
+					ok = false;
+					String s = str.substring(start + 1, i);
+					if(s.trim().length() > 0){
+						result.add(s.trim());
+					}
+					start = -1;
+				}
+			}
+			else {
+				i++;
+			}
+		}
+		
+		return result;
+	}
 }
