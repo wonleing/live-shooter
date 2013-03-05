@@ -64,10 +64,7 @@ public class LoginActivity extends Activity implements OnClickListener{
         
         username = (TextView)findViewById(R.id.email);
         password = (TextView)findViewById(R.id.pass);
-        
-        //test
-        username.setText("cjp0209");
-        password.setText("840209");
+
 	}
 
 	@Override
