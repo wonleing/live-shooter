@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.conf import settings
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from liveshooter.models import Followship, Userlike, User, Uservideo, Video
-import xmlrpclib
+from ftplib import FTP
+import xmlrpclib, os
 s=xmlrpclib.ServerProxy("%s:8000" %settings.XMLRPC_URL)
 
 def index(request):
@@ -50,3 +51,21 @@ def following(request, userid):
     }
     return render(request, 'following.html', context)
 
+def addnew(request, userid):
+    context = {
+        'uid': userid,
+    }
+    return render(request, 'addnew.html', context)
+
+def doadd(request):
+    userid = int(request.POST.get('userid'))
+    videotitle = request.POST.get('videotitle').replace("'", "`")
+    videopath = request.FILES['videopath']
+    videoid = s.genFilename()
+    videoname = videoid + "." + videopath._get_name().split(".")[1]
+    snsid = "FAKE_SNSID_OF_VIDEO_"+videoid
+    s.addTitle(userid, videoid, videotitle)
+    os.system("mv %s /var/ftp/pub/%s;chmod 666 /var/ftp/pub/%s" %(videopath.temporary_file_path(), videoname, videoname))
+    url = s.finishUpload(videoid)
+    return HttpResponse('<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=../user/%s"></head>Your video can be watched here: %s</html>' 
+    %(userid, url))

@@ -1,0 +1,13 @@
+{% include "header.html" %}
+{% if uid %}
+        <form action="{% url 'doadd' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label>Video description:</label>&emsp;<input type="text" name="videotitle" size=100 /></br>
+            <label>Choose your Video:</label>&emsp;<input type="file" name="videopath" /></br>
+            <input type="hidden" name="userid" value="{{ uid }}" />
+            <p><input type="submit" value="Upload" /></p>
+        </form>
+{% else %}
+    <p>No user id specified.</p>
+{% endif %}
+{% include "footer.html" %}
