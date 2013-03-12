@@ -11,4 +11,6 @@ urlpatterns = patterns('',
     url(r'^user/(?P<userid>\d+)/$', views.user, name='user'),
     url(r'^follower/(?P<userid>\d+)/$', views.follower, name='follower'),
     url(r'^following/(?P<userid>\d+)/$', views.following, name='following'),
+    url(r'^addnew/(?P<userid>\d+)/$', views.addnew, name='addnew'),
+    url(r'^doadd$', views.doadd, name='doadd'),
 )

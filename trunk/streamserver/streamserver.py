@@ -19,7 +19,7 @@ server.register_introspection_functions()
 
 segmentlength = 10
 segnum = 999
-ext = ".mp4"
+refresh_days = 100
 uploadpath = "/var/ftp/pub/"
 httpdir = "/var/www/"
 exportdir = "http://" + options.publicdns + "/"
@@ -40,19 +40,19 @@ class TimeEncoder(json.JSONEncoder):
 
 class StreamServer:
 
-    def _createHtml(self, videoid):
+    def _createHtml(self, videoid, videoname):
         t = open("template.html", "r")
         os.mkdir(httpdir+videoid)
         n = open(httpdir+videoid+"/index.html", "w")
-        n.write(t.read().replace("FileName", videoid))
+        n.write(t.read().replace("FileName", videoid).replace("FullName", videoname))
         t.close()
         n.close()
         logger.debug("html page for %s created" %videoid)
 
-    def _streaming(self, videoid):
-        origfile = uploadpath + videoid
+    def _streaming(self, videoid, videoname):
+        origfile = uploadpath + videoname
         outname = httpdir + videoid + "/" + videoid
-        infile = outname + ext
+        infile = httpdir + videoid + "/" + videoname
         exportname = exportdir + videoid + "/" + videoid
         os.system("mv %s %s" %(origfile, infile))
         vinfo = os.popen("./midentify.sh %s" %infile).readlines()
@@ -101,9 +101,12 @@ class StreamServer:
 
     def finishUpload(self, videoid):
         logger.debug("upload completed, start to covert %s into HLS" % videoid)
-        self._createHtml(videoid)
+        for f in os.listdir(uploadpath):
+            if f[:8] == videoid:
+                videoname = f
+        self._createHtml(videoid, videoname)
         try:
-            thread.start_new_thread(self._streaming, (videoid,))
+            thread.start_new_thread(self._streaming, (videoid, videoname))
         except:
             return False
         return exportdir + videoid
@@ -207,7 +210,7 @@ class StreamServer:
 
     def getRecommandVideo(self, nojson=False):
         logger.debug("return top 100 video of this week")
-        d = datetime.timedelta(days=7)
+        d = datetime.timedelta(days=refresh_days)
         db = lsdb.DB()
         ret = db.getTopVideo(datetime.date.today()-d)
         if nojson:
