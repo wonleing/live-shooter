@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from django.conf import settings
 from django.http import Http404, HttpResponse
@@ -74,8 +75,8 @@ def doadd(request):
         APP_SECRET = 'f236cdb4c1fbc8d243ab580c115ac9e1'  
         CALLBACK_URL = 'http://liveshooter.cn.mu/weibo_auth/callback.php'
         burl = 'http://54.248.182.51/'
-        msg = videotitle + burl + videoid
-        snapshoot = burl + videoid + videoid + ".jpeg"
+        msg = videotitle + " " + burl + videoid
+        snapshot = burl + videoid + "/" + videoid + ".jpeg"
         ACCOUNT = request.POST.get('account')
         PASSWORD = request.POST.get('password')
         client = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
@@ -89,9 +90,9 @@ def doadd(request):
         conn.close()
         r = client.request_access_token(code)
         client.set_access_token(r.access_token, r.expires_in)
-        client.statuses.upload.post(status=msg, pic=urllib.urlopen(snapshoot))
+        client.statuses.upload.post(status=msg, pic=urllib.urlopen(snapshot))
         message = "</br>Video link posted on your weibo successfully"
     except:
         message = "</br>Video link failed to post on your weibo"
-    return HttpResponse('''<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=../user/%s"></head>
+    return HttpResponse('''<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=user/%s"></head>
     Your video can be watched here: %s,%s</html>''' %(userid, url, message))
