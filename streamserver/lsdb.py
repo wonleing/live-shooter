@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 DB_type = 'mysql'
 
 class DB:

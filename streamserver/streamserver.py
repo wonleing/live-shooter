@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#coding=utf-8
+# -*- coding: utf-8 -*-
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 import os, sys, random, string, optparse, logging, time, lsdb, thread, json, datetime, urllib2
 
