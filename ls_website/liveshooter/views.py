@@ -67,5 +67,28 @@ def doadd(request):
     s.addTitle(userid, videoid, videotitle)
     os.system("mv %s /var/ftp/pub/%s;chmod 666 /var/ftp/pub/%s" %(videopath.temporary_file_path(), videoname, videoname))
     url = s.finishUpload(videoid)
-    return HttpResponse('<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=../user/%s"></head>Your video can be watched here: %s</html>' 
-    %(userid, url))
+    try:
+        from weibo import APIClient
+        import urllib,httplib,sys
+        APP_KEY = '997501600' 
+        APP_SECRET = 'f236cdb4c1fbc8d243ab580c115ac9e1'  
+        CALLBACK_URL = 'http://liveshooter.cn.mu/weibo_auth/callback.php'
+        ACCOUNT = request.POST.get('account')
+        PASSWORD = request.POST.get('password')
+        client = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
+        conn = httplib.HTTPSConnection('api.weibo.com')
+        postdata = urllib.urlencode({'client_id':APP_KEY,'response_type':'code','redirect_uri':CALLBACK_URL,'action':'submit',
+        'userId':ACCOUNT,'passwd':PASSWORD,'isLoginSina':0,'from':'','regCallback':'','state':'','ticket':'','withOfficalFlag':0})
+        conn.request('POST','/oauth2/authorize',postdata,{'Referer':client.get_authorize_url(),
+        'Content-Type':'application/x-www-form-urlencoded'})
+        res = conn.getresponse()
+        code = res.getheader('location').split('=')[1]
+        conn.close()
+        r = client.request_access_token(code)
+        client.set_access_token(r.access_token, r.expires_in)
+        #client.post.statuses__update(status=videotitle)
+        message = "</br>Video link posted on your weibo successfully"
+    except:
+        message = "</br>Video link failed to post on your weibo"
+    return HttpResponse('''<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=../user/%s"></head>
+    Your video can be watched here: %s,%s</html>''' %(userid, url, message))
