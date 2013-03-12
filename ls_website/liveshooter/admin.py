@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from liveshooter.models import Followship, Userlike, User, Uservideo, Video, Videocheck
 from django.contrib import admin
 from django.conf import settings
