@@ -3,7 +3,7 @@
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 import os, sys, random, string, optparse, logging, time, lsdb, thread, json, datetime, urllib2
 
-u = """./%prog -s <server_ip>\nDebug: ./%prog -s 127.0.0.1 > /dev/null 2>&1"""
+u = """./%prog -s <internal_ip> -p <public_dns>\nDebug: ./%prog -s 127.0.0.1"""
 parser = optparse.OptionParser(u)
 parser.add_option('-s', '--server', help='stream server internal ip address', dest='serverip')
 parser.add_option('-p', '--public', help='public DNS', dest='publicdns')
@@ -20,6 +20,8 @@ server.register_introspection_functions()
 segmentlength = 10
 segnum = 999
 refresh_days = 100
+max_vbit = 700
+max_abit = 128
 uploadpath = "/var/ftp/pub/"
 httpdir = "/var/www/"
 exportdir = "http://" + options.publicdns + "/"
@@ -40,22 +42,21 @@ class TimeEncoder(json.JSONEncoder):
 
 class StreamServer:
 
-    def _createHtml(self, videoid, videoname):
+    def _createHtml(self, videoid, ext):
         t = open("template.html", "r")
         os.mkdir(httpdir+videoid)
         n = open(httpdir+videoid+"/index.html", "w")
-        n.write(t.read().replace("FileName", videoid).replace("FullName", videoname))
+        n.write(t.read().replace("FileName", videoid).replace("FullName", videoid+ext))
         t.close()
         n.close()
         logger.debug("html page for %s created" %videoid)
 
-    def _streaming(self, videoid, videoname):
-        origfile = uploadpath + videoname
+    def _streaming(self, videoid, ext):
+        origfile = uploadpath + videoid + ext
         outname = httpdir + videoid + "/" + videoid
-        infile = httpdir + videoid + "/" + videoname
         exportname = exportdir + videoid + "/" + videoid
-        os.system("mv %s %s" %(origfile, infile))
-        vinfo = os.popen("./midentify.sh %s" %infile).readlines()
+        vinfo = os.popen("./midentify.sh %s" %origfile).readlines()
+        logger.debug("./midentify.sh %s" %origfile)
         for k in vinfo:
             if "WIDTH" in k:
                 width = int(k.split("=")[1])
@@ -63,17 +64,28 @@ class StreamServer:
                 height = int(k.split("=")[1])
             if "VIDEO_BITRATE" in k:
                 vbit = int(k.split("=")[1])/1000
+                if vbit > max_vbit:
+                    vbit = max_vbit
             if "AUDIO_BITRATE" in k:
                 abit = int(k.split("=")[1])/1000
-        logger.debug("video height: %d, width: %d, vbit: %d, abit: %d" %(width, height, vbit, abit))
-        os.system("vlc -I dummy --video-filter=scene --vout=dummy --no-audio --scene-ratio=120 --start-time=1 --stop-time=2 \
-        --scene-path=%s --scene-prefix=%s --scene-format=jpeg --scene-replace %s vlc://quit &>/dev/null" \
-        % (httpdir+videoid+"/", videoid, infile))
+                if abit > max_abit:
+                    abit = max_abit
+        logger.debug("video width: %d, height: %d, vbit: %d, abit: %d" %(width, height, vbit, abit))
+        if ext == ".flv" or ext == ".webm" or ext == ".ogv":
+            infile = outname + ext
+            self._createHtml(videoid, ext)
+            os.system("ffmpeg -i %s -ss 1 -vframes 1 %s.jpeg > /dev/null 2>&1" %(origfile, outname))
+            os.system("cp %s %s" %(origfile, infile))
+        else:
+            infile = outname + ".flv"
+            self._createHtml(videoid, ".flv")
+            os.system("ffmpeg -i %s -ss 1 -vframes 1 %s.jpeg > /dev/null 2>&1" %(origfile, outname))
+            os.system("ffmpeg -i %s -b %dk -s %dx%d -r 20 -acodec libvo_aacenc %s > /dev/null 2>&1" %(origfile, vbit, width, height, infile))
         os.system("vlc %s --sout='#transcode{width=%d,height=%d,vcodec=h264,vb=%d,venc=x264{aud,profile=baseline,\
         level=30,keyint=30,ref=1},acodec=aac,ab=%d,deinterlace}:std{access=livehttp{seglen=%d,delsegs=true,numsegs=%d,index=%s.m3u8,\
-        index-url=%s-########.ts},mux=ts{use-key-frames},dst=%s-########.ts}' vlc://quit -I dummy" \
-        % (infile, width, height, vbit, abit, segmentlength, segnum, outname, exportname, outname))
-        logger.debug("Transcode for %s to HLS completed" % infile)
+        index-url=%s-########.ts},mux=ts{use-key-frames},dst=%s-########.ts}' vlc://quit -I dummy > /dev/null 2>&1;rm -rf %s" \
+        % (origfile, width, height, vbit, abit, segmentlength, segnum, outname, exportname, outname, origfile))
+        logger.debug("Transcode for %s to HLS completed" % origfile)
 
     def loginUser(self, uname, usns, nickname, uicon):
         db = lsdb.DB()
@@ -104,9 +116,9 @@ class StreamServer:
         for f in os.listdir(uploadpath):
             if f[:8] == videoid:
                 videoname = f
-        self._createHtml(videoid, videoname)
+                ext = f[8:]
         try:
-            thread.start_new_thread(self._streaming, (videoid, videoname))
+            thread.start_new_thread(self._streaming, (videoid, ext))
         except:
             return False
         return exportdir + videoid
