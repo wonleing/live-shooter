@@ -4,7 +4,7 @@
 #apt-get download libsqlite3-0:amd64 libsqlite3-0:i386
 #sudo dpkg --install libsqlite3-0*amd64.deb libsqlite3-0*i386.deb
 sudo apt-get update
-sudo apt-get install vsftpd subversion vlc sqlite3 openssh-server apache2 mplayer python-mysqldb
+sudo apt-get install vsftpd subversion vlc sqlite3 openssh-server apache2 mplayer python-mysqldb libav-tools
 
 sudo touch /var/log/liveshooter.log
 sudo mkdir -p /var/ftp/pub /var/www

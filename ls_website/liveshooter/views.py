@@ -61,7 +61,10 @@ def addnew(request, userid):
 def doadd(request):
     userid = int(request.POST.get('userid'))
     videotitle = request.POST.get('videotitle').replace("'", "`")
-    videopath = request.FILES['videopath']
+    try:
+        videopath = request.FILES['videopath']
+    except:
+        return HttpResponse('<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=user/%s"></head>Please choose a video</html>' %userid)
     videoid = s.genFilename()
     videoname = videoid + "." + videopath._get_name().split(".")[1]
     snsid = "FAKE_SNSID_OF_VIDEO_"+videoid
