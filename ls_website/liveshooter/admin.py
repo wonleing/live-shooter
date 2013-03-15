@@ -56,12 +56,16 @@ class VideocheckAdmin(admin.ModelAdmin):
         rows_updated = queryset.update(status='checked', operator=request.user.username)
         self.message_user(request, "%s video(s) successfully marked as checked." % rows_updated)
     make_checked.short_description = "Mark selected videos as checked"
+    def delete_selected(self, request, queryset):
+        for element in queryset:
+            self.delete_model(request, element)
+    delete_selected.short_description = "Delete selected elements"
     readonly_fields = ('videoid', 'operator')
     fields = ['videoid', 'status', 'operator']
     list_display = ('videoid', 'status', 'publish_time', 'play_link')
     list_filter = ('status',)
-    actions = [make_checked]
-    admin.site.disable_action('delete_selected')
+    actions = [make_checked, delete_selected]
+    #admin.site.disable_action('delete_selected')
 
 for i in ("Followship", "Userlike", "User", "Uservideo", "Video", "Videocheck"):
     admin.site.register(eval(i), eval(i+"Admin"))
