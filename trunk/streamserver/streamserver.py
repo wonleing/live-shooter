@@ -31,7 +31,7 @@ hdlr = logging.FileHandler(logfile)
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 sina_friend_url = 'https://api.weibo.com/2/friendships/friends.json?screen_name=%s&access_token=2.00taLJZBUj6VFBef805927ebBSuBKE'
 
 class TimeEncoder(json.JSONEncoder):
@@ -49,14 +49,14 @@ class StreamServer:
         n.write(t.read().replace("FileName", videoid).replace("FullName", videoid+ext))
         t.close()
         n.close()
-        logger.debug("html page for %s created" %videoid)
+        logger.info("html page for %s created" %videoid)
 
     def _streaming(self, videoid, ext):
         origfile = uploadpath + videoid + ext
         outname = httpdir + videoid + "/" + videoid
         exportname = exportdir + videoid + "/" + videoid
         vinfo = os.popen("./midentify.sh %s" %origfile).readlines()
-        logger.debug("./midentify.sh %s" %origfile)
+        logger.info("./midentify.sh %s" %origfile)
         for k in vinfo:
             if "WIDTH" in k:
                 width = int(k.split("=")[1])
@@ -71,7 +71,7 @@ class StreamServer:
                 if abit > max_abit:
                     abit = max_abit
         logger.debug("video width: %d, height: %d, vbit: %d, abit: %d" %(width, height, vbit, abit))
-        if ext == ".flv" or ext == ".webm" or ext == ".ogv":
+        if ext in (".flv", ".webm", ".ogv", ".mp4"):
             infile = outname + ext
             self._createHtml(videoid, ext)
             os.system("ffmpeg -i %s -ss 1 -vframes 1 %s.jpeg > /dev/null 2>&1" %(origfile, outname))
@@ -80,12 +80,12 @@ class StreamServer:
             infile = outname + ".flv"
             self._createHtml(videoid, ".flv")
             os.system("ffmpeg -i %s -ss 1 -vframes 1 %s.jpeg > /dev/null 2>&1" %(origfile, outname))
-            os.system("ffmpeg -i %s -b %dk -s %dx%d -r 20 -acodec libvo_aacenc %s > /dev/null 2>&1" %(origfile, vbit, width, height, infile))
+            os.system("ffmpeg -i %s -b %dk -s %dx%d -r 20 -acodec copy %s > /dev/null 2>&1" %(origfile, vbit, width, height, infile))
         os.system("vlc %s --sout='#transcode{width=%d,height=%d,vcodec=h264,vb=%d,venc=x264{aud,profile=baseline,\
-        level=30,keyint=30,ref=1},acodec=aac,ab=%d,deinterlace}:std{access=livehttp{seglen=%d,delsegs=true,numsegs=%d,index=%s.m3u8,\
+        level=30,keyint=30,ref=1},acodec=mp3,ab=%d}:std{access=livehttp{seglen=%d,delsegs=true,numsegs=%d,index=%s.m3u8,\
         index-url=%s-########.ts},mux=ts{use-key-frames},dst=%s-########.ts}' vlc://quit -I dummy > /dev/null 2>&1;rm -rf %s" \
         % (origfile, width, height, vbit, abit, segmentlength, segnum, outname, exportname, outname, origfile))
-        logger.debug("Transcode for %s to HLS completed" % origfile)
+        logger.info("Transcode for %s to HLS completed" % origfile)
 
     def loginUser(self, uname, usns, nickname, uicon):
         db = lsdb.DB()
@@ -101,18 +101,18 @@ class StreamServer:
     def genFilename(self):
         rand = "".join(random.sample(string.ascii_letters+string.digits, 8))
         if os.path.exists( httpdir + rand):
-            logger.debug("random filename already existed, genFilename again!")
+            logger.info("random filename already existed, genFilename again!")
             self._genFilename()
-        logger.debug("genFilename returns ==%s== as the file name" % rand)
+        logger.info("genFilename returns %s as the file name" % rand)
         return rand
 
     def addTitle(self, userid, videoid, videotitle=""):
-        logger.debug("user %d add title %s to video %s" %(userid, videotitle, videoid))
+        logger.info("user %d create new video %s" %(userid, videoid))
         db = lsdb.DB()
         return db.addVideo(userid, videoid, videotitle)
 
     def finishUpload(self, videoid):
-        logger.debug("upload completed, start to covert %s into HLS" % videoid)
+        logger.info("upload completed, start to covert %s into HLS" % videoid)
         for f in os.listdir(uploadpath):
             if f[:8] == videoid:
                 videoname = f
@@ -124,17 +124,17 @@ class StreamServer:
         return exportdir + videoid
 
     def shareVideo(self, videoid, snsid): 
-        logger.debug("video %s published on sns web with id: %s" % (videoid, snsid))
+        logger.info("video %s published on sns web with id: %s" % (videoid, snsid))
         db = lsdb.DB()
         return db.shareVideo(videoid, snsid)
 
     def likeVideo(self, userid, videoid):
-        logger.debug("user %d like video %s, try add feed and score" % (userid, videoid))
+        logger.info("user %d like video %s, try add feed and score" % (userid, videoid))
         db = lsdb.DB()
         return db.likeVideo(userid, videoid)
 
     def unlikeVideo(self, userid, videoid):
-        logger.debug("user %d unlike video %s, remove feed and score" % (userid, videoid))
+        logger.info("user %d unlike video %s, remove feed and score" % (userid, videoid))
         db = lsdb.DB()
         return db.unlikeVideo(userid, videoid)
 
@@ -142,12 +142,12 @@ class StreamServer:
         if userid == targetid:
             logger.warning("invalid operation - %d follow himself" %userid)
             return False
-        logger.debug("user %d followed user %d" %(userid, targetid))
+        logger.info("user %d followed user %d" %(userid, targetid))
         db = lsdb.DB()
         return db.followUser(userid, targetid)
 
     def followVideo(self, userid, videoid):
-        logger.debug("user %d followed the owner of video %s" %(userid, videoid))
+        logger.info("user %d followed the owner of video %s" %(userid, videoid))
         db = lsdb.DB()
         targetid = db.getVideoUser(videoid)
         if userid == targetid:
@@ -156,12 +156,12 @@ class StreamServer:
         return db.followUser(userid, targetid)
 
     def unfollowUser(self, userid, targetid):
-        logger.debug("user %d unfollowed user %d" %(userid, targetid))
+        logger.info("user %d unfollowed user %d" %(userid, targetid))
         db = lsdb.DB()
         return db.unfollowUser(userid, targetid)
 
     def unfollowVideo(self, userid, videoid):
-        logger.debug("user %d unfollowed the owner of video %s" %(userid, videoid))
+        logger.info("user %d unfollowed the owner of video %s" %(userid, videoid))
         db = lsdb.DB()
         targetid = db.getVideoUser(videoid)
         if targetid:
