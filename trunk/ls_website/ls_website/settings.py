@@ -161,3 +161,5 @@ LOGGING = {
         },
     }
 }
+FILE_UPLOAD_PERMISSIONS=0666
+FILE_UPLOAD_HANDLERS = ("django.core.files.uploadhandler.TemporaryFileUploadHandler",)

@@ -5,7 +5,7 @@ from django.http import Http404, HttpResponse
 from liveshooter.models import Followship, Userlike, User, Uservideo, Video
 from ftplib import FTP
 import xmlrpclib, os
-s=xmlrpclib.ServerProxy("%s:8000" %settings.XMLRPC_URL)
+s=xmlrpclib.ServerProxy("%s:8000" %settings.XMLRPC_URL, encoding='latin-1')
 
 def index(request):
     recommand_users = s.getRecommandUser(True)
@@ -60,16 +60,17 @@ def addnew(request, userid):
 
 def doadd(request):
     userid = int(request.POST.get('userid'))
-    videotitle = request.POST.get('videotitle').replace("'", "`")
+    videotitle = request.POST.get('videotitle').replace("'", "`").encode('utf-8')
     try:
         videopath = request.FILES['videopath']
     except:
         return HttpResponse('<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=user/%s"></head>Please choose a video</html>' %userid)
     videoid = s.genFilename()
     videoname = videoid + "." + videopath._get_name().split(".")[1]
-    snsid = "FAKE_SNSID_OF_VIDEO_"+videoid
-    s.addTitle(userid, videoid, videotitle)
-    os.system("mv %s /var/ftp/pub/%s;chmod 666 /var/ftp/pub/%s" %(videopath.temporary_file_path(), videoname, videoname))
+    os.system("mv %s /var/ftp/pub/%s;chmod 644 /var/ftp/pub/%s" %(videopath.temporary_file_path(), videoname, videoname))
+    if not s.addTitle(userid, videoid, videotitle):
+         return HttpResponse('<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=user/%s"></head>Add video title failed\n%s</html>' \
+         %(userid, str(userid)+","+videoid+","+videotitle))
     url = s.finishUpload(videoid)
     try:
         from weibo import APIClient
