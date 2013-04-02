@@ -50,10 +50,10 @@
 ||Implement website, adminsite on public server with new API, update API doc||2013/1/24||2013/2/2||Leon||Done||
 ||Upgrade public server with django 1.5, public website, video tutorials ||2013/2/3||2013/2/23||Leon||Done||
 ||message(via user and video) module design and implement|| || || ||Wait||
-||_ios_ Sina Mini Blog Login||2013/1/5||2013/1/7||Arashmen||In progress||
-||_ios_ Record Video ||2013/1/8||2013/1/13||Arashmen||Waiting||
-||_ios_ Upload Video||2013/1/14||2013/1/16||Arashmen||Waiting||
-||_ios_ Debug With Server ||2013/1/17||2013/1/19||Arashmen||Waiting||
+||_ios_ Sina Mini Blog Login||2013/1/5||2013/1/7||Arashmen||Done||
+||_ios_ Record Video ||2013/1/8||2013/1/13||Arashmen||Done||
+||_ios_ Upload Video||2013/1/14||2013/1/16||Arashmen||In progress||
+||_ios_ Debug With Server ||2013/1/17||2013/1/19||Arashmen||In progress||
 ||_Android_ login screen||2013/1/7||2013/1/8||JP||Done||
 ||_Android_ recording screen||2013/1/9||2013/1/12||JP||Done||
 ||_Android_ feed screen||2013/1/21||2013/1/26||JP||Done||
