@@ -81,8 +81,8 @@ class StreamServer:
             self._createHtml(videoid, ".flv")
             os.system("ffmpeg -i %s -ss 1 -vframes 1 %s.jpeg > /dev/null 2>&1" %(origfile, outname))
             os.system("ffmpeg -i %s -b %dk -s %dx%d -r 20 -acodec copy %s > /dev/null 2>&1" %(origfile, vbit, width, height, infile))
-        os.system("vlc %s --sout='#transcode{width=%d,height=%d,vcodec=h264,vb=%d,venc=x264{aud,profile=baseline,\
-        level=30,keyint=30,ref=1},acodec=mp3,ab=%d}:std{access=livehttp{seglen=%d,delsegs=true,numsegs=%d,index=%s.m3u8,\
+        os.system("vlc %s --sout='#transcode{width=%d,height=%d,vcodec=h264,vb=%d,fps=25,venc=x264{aud,profile=baseline,\
+        level=30,keyint=30,ref=1},acodec=mp4a,ab=%d,deinterlace}:std{access=livehttp{seglen=%d,delsegs=true,numsegs=%d,index=%s.m3u8,\
         index-url=%s-########.ts},mux=ts{use-key-frames},dst=%s-########.ts}' vlc://quit -I dummy > /dev/null 2>&1;rm -rf %s" \
         % (origfile, width, height, vbit, abit, segmentlength, segnum, outname, exportname, outname, origfile))
         logger.info("Transcode for %s to HLS completed" % origfile)
