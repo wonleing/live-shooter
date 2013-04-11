@@ -22,8 +22,6 @@ def index(request):
     context = {
         'recommand_users': recommand_users,
         'recommand_videos': recommand_videos,
-        'login_user': request.session['login_user'],
-        'login_id': request.session['login_id']
     }
     _check_login(request, context)
     return render(request, 'index.html', context)
@@ -105,7 +103,6 @@ def doadd(request):
             message = "</br>Failed to post on your weibo because of wrong account password"
     except:
         message = "</br>Failed to post on your weibo because of illegal words"
-    return HttpResponse(message)
     return HttpResponse('''<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=user/%s"></head>
     Your video can be watched here: %s,%s</html>''' %(userid, url, message))
 
