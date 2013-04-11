@@ -6,7 +6,9 @@
 {% else %}
     <p>No user profile found.</p>
 {% endif %}
-<p><a href="{% url 'addnew' up.0 %}">Add a new video with this user</a></p>
+{% if login_user == up.2 %}
+    <p><a href="{% url 'addnew' up.0 %}">Add a new video with this user</a></p>
+{% endif %}
 {% if user_videos %}
     <h4>Videos uploaded by <b>{{ up.2 }}</b></h4>
     <ul>

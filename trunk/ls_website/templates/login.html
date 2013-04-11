@@ -1,0 +1,16 @@
+{% include "header.html" %}
+{% if login_user and login_id %}
+    <p>You have already logined.</p>
+{% else %}
+    <p>Login with your SNS account:</p>
+    <form action="{% url 'dologin' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Account:</label>&emsp;<input type="text" name="account" size=30 /></br>
+        <label>Password:</label>&emsp;<input type="password" name="password" /></br>
+        <label>SNS site:</label>&emsp;<select size="1" name="site">
+            <option selected="selected" value="sina">Sina Weibo</option>
+        </select>
+        <p><input type="submit" value="Login" /></p>
+    </form>
+{% endif %}
+{% include "footer.html" %}
