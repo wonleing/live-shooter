@@ -8,6 +8,9 @@ import xmlrpclib, os, sina
 s=xmlrpclib.ServerProxy("%s:8000" %settings.XMLRPC_URL, encoding='latin-1')
 burl = 'http://54.248.182.51/'
 
+def genfn(request):
+    return HttpResponse(s.genFilename())
+
 def _check_login(request, context):
     if 'login_user' not in request.session:
         request.session['login_user'] = ""
@@ -24,24 +27,60 @@ def index(request):
         'recommand_videos': recommand_videos,
     }
     _check_login(request, context)
+    if context['login_id']:
+        login_id = int(context['login_id'])
+        context['follow_users'] = s.getFollowing(login_id, True)
+        context['feed_videos'] = s.getFeed(login_id, True)
     return render(request, 'index.html', context)
 
 def user(request, userid):
     try:
         user_profile = s.getUserProfile(int(userid), True)
         user_videos = s.getUserVideo(int(userid), True)
+        user_followers = s.getFollower(int(userid), True)
     except:
         raise Http404
-    if 'login_user' not in request.session:
-        request.session['login_user'] = ""
-    if 'login_id' not in request.session:
-        request.session['login_id'] = ""
+    followed = False
+    for uf in user_followers:
+        if request.session['login_id'] == uf[0]:
+            followed = True
     context = {
         'up': user_profile,
-        'user_videos': user_videos
+        'user_videos': user_videos,
+        'followed': followed,
     }
     _check_login(request, context)
     return render(request, 'user.html', context)
+
+def video(request, videoid):
+    try:
+        video_info = s.getVideoInfo(videoid, True)
+    except:
+        raise Http404
+    for ext in [".mp4", ".flv", ".ogv", ".webm"]:
+        if ext in str(os.listdir(settings.MEDIA_ROOT+videoid)):
+            break
+    user_agent = request.META['HTTP_USER_AGENT'].lower()
+    HLS = False
+    for a in ['iphone', 'ipad', 'mac os', 'android']:
+        if a in user_agent:
+            HLS = True
+            break
+    context = {
+        'videoid': videoid,
+        'HLS': HLS,
+        'ext': ext,
+        'vi': video_info,
+    }
+    _check_login(request, context)
+    context['liked'] = False
+    if context['login_id']:
+        login_id = int(context['login_id'])
+        for v in s.getLikeVideo(login_id, True):
+           if videoid == v[0]:
+               context['liked'] = True
+               break
+    return render(request, 'video.html', context)
 
 def follower(request, userid):
     try:
@@ -134,4 +173,36 @@ def logout(request):
     request.session['login_user'] = ""
     request.session['login_id'] = ""
     return HttpResponse('''<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=/"></head>logout successfully!''')
+
+def follow(request):
+    uid = int(request.POST['uid'])
+    targetid = int(request.POST['targetid'])
+    if s.followUser(uid, targetid):
+        return HttpResponse()
+    else:
+        return HttpResponse(status=201)
+
+def unfollow(request):
+    uid = int(request.POST['uid'])
+    targetid = int(request.POST['targetid'])
+    if s.unfollowUser(uid, targetid):
+        return HttpResponse()
+    else:
+        return HttpResponse(status=201)
+
+def likevideo(request):
+    uid = int(request.POST['uid'])
+    videoid = request.POST['videoid']
+    if s.likeVideo(uid, videoid):
+        return HttpResponse()
+    else:
+        return HttpResponse(status=201)
+
+def unlikevideo(request):
+    uid = int(request.POST['uid'])
+    videoid = request.POST['videoid']
+    if s.unlikeVideo(uid, videoid):
+        return HttpResponse()
+    else:
+        return HttpResponse(status=201)
 

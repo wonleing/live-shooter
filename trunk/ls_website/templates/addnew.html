@@ -1,4 +1,6 @@
-{% include "header.html" %}
+{% extends "base.html" %}
+
+{% block pagebody %}
 {% ifequal login_id uid %}
     <form action="{% url 'doadd' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -13,4 +15,4 @@
     <p>{{login_id}},{{uid}}</p>
     <p>Please login before adding new video.</p>
 {% endifequal %}
-{% include "footer.html" %}
+{% endblock %}

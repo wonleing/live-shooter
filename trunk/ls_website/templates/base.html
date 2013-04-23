@@ -1,0 +1,23 @@
+<head>
+    <script src="{{ STATIC_URL }}js/jquery-1.9.1.min.js"></script>  
+    <title>Liveshooter - Record and share your own video now!</title>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/base.css" type="text/css" />
+</head>
+<body>
+    {% csrf_token %}
+    <img src="{{ STATIC_URL }}pic/banner.jpg" width="100%" />
+    {% if login_user and login_id %}
+        <div align="right"><a href="{% url 'user' login_id %}"><b>Welcome {{ login_user }}</b></a> | <a href="{% url 'logout' %}"><b>logout</b></a></div>
+    {% else %}
+        <div align="right"><a href="{% url 'login' %}"><b>login</h4></b></a></div>
+    {% endif %}
+    {% block pagebody %}
+    {% endblock %}
+    <h3 align="center"><a href="../../">Check out most popular people and videos now!</a></h3>
+    <script language="JavaScript">  
+    $(document).ready(function() {
+        {% block on_ready %}
+        {% endblock %}
+    });
+    </script> 
+</body>

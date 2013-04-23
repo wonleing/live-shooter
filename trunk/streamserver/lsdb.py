@@ -95,9 +95,10 @@ class DB:
         self.cx.commit()
         return True
 
-    def getVideoUser(self, videoid):
-        self.cu.execute("select userid from uservideo where videoid='%s'" %videoid)
-        return self.cu.fetchall()[0][0]
+    def getVideoInfo(self, videoid):
+        self.cu.execute("select v.*, u.* from video as v, uservideo as uv, user as u where uv.videoid=v.videoid and \
+        uv.userid=u.userid and v.videoid='%s'" %videoid)
+        return self.cu.fetchall()[0]
 
     def getUserVideo(self, userid):
         self.cu.execute("select v.* from video as v,uservideo as uv where uv.videoid=v.videoid and uv.userid=%d \
