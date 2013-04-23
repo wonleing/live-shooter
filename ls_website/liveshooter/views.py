@@ -131,7 +131,7 @@ def doadd(request):
          return HttpResponse('<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=user/%s"></head>Add video title failed\n%s</html>' \
          %(userid, str(userid)+","+videoid+","+videotitle))
     url = s.finishUpload(videoid)
-    msg = "videotitle" + " " + burl + videoid
+    msg = videotitle + " " + burl + videoid
     snapshot = burl + videoid + "/" + videoid + ".jpeg"
     try:
         wb = sina.Weibo()
