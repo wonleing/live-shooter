@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block pagebody %}
+<div align="center">
+  <h4>{{ vi.1 }}</h4>
+  {% if HLS %}
+    <center>
+      <video width='480' height='270' src="{{ MEDIA_URL }}{{ videoid }}/{{ videoid }}.m3u8" controls autoplay />
+    </center>
+  {% else %}
+    <script src="{{ MEDIA_URL }}jwplayer/jwplayer.js"></script>
+    <script>jwplayer.key="Y/yp6D/PqY3MWODtAsgLoDWr8ExJZw+hsWZ84w=="</script>
+      <div id="myElement" style="text-align:center; vertical-align:middle;">loading...</div>
+      <script type="text/javascript">
+        jwplayer("myElement").setup({
+          file: "{{ MEDIA_URL }}{{ videoid }}/{{ videoid }}{{ ext }}",
+          image: "{{ MEDIA_URL }}{{ videoid }}/{{ videoid }}.jpeg",
+        });
+      </script>
+  {% endif %}
+  <div id="tag_like">
+  uploaded by <a href="{% url 'user' vi.5 %}"><img src="{{ vi.8 }}" title="{{ vi.7 }}" height="24" width="24" />{{ vi.7 }}</a>&emsp;
+  Score:<b>{{ vi.3 }}</b>&emsp;Upload time:<i>{{ vi.4 }}</i>&emsp;
+  {% if login_id %}
+    {% if liked %}
+      <img id="unlike" title="unlike" src="{{ STATIC_URL }}pic/bad.png" /> 
+    {% else %}
+      <img id="like" title="like" src="{{ STATIC_URL }}pic/good.png" />
+    {% endif %}
+  {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block on_ready %}
+$.ajaxSetup({
+  data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+});
+$('#tag_like').on('click','#like',function(){
+   $.post("{% url 'likevideo' %}", {uid:{{ login_id }}, videoid:"{{ videoid }}"}, function(data,status){
+      $('#tag_like').load(' #tag_like')
+   });
+});
+$('#tag_like').on('click','#unlike',function(){
+   $.post("{% url 'unlikevideo' %}", {uid:{{ login_id }}, videoid:"{{ videoid }}"}, function(data,status){
+      $('#tag_like').load(' #tag_like')
+   });
+});
+{% endblock %}

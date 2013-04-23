@@ -86,4 +86,10 @@ if s.unlikeVideo(userid, videoid):
 fl = s.getSNSfollowing('DemonLeon', 'sina')
 print "DemonLeon have following sina friends in our site", fl
 
+ll = s.getLikeVideo(userid)
+print "user", userid, "video like list is:", str(ll)
+
+vi = s.getVideoInfo(video)
+print "video", videoid, "info is:", str(vi)
+
 print "API testing finished!"

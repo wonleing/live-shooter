@@ -1,4 +1,6 @@
-{% include "header.html" %}
+{% extends "base.html" %}
+
+{% block pagebody %}
 {% if login_user and login_id %}
     <p>You have already logined.</p>
 {% else %}
@@ -13,4 +15,4 @@
         <p><input type="submit" value="Login" /></p>
     </form>
 {% endif %}
-{% include "footer.html" %}
+{% endblock %}

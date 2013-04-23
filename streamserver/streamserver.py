@@ -46,7 +46,7 @@ class StreamServer:
         t = open("template.html", "r")
         os.mkdir(httpdir+videoid)
         n = open(httpdir+videoid+"/index.html", "w")
-        n.write(t.read().replace("FileName", videoid).replace("FullName", videoid+ext))
+        n.write(t.read().replace("BURL", exportdir).replace("VIDEOID", videoid))
         t.close()
         n.close()
         logger.info("html page for %s created" %videoid)
@@ -149,7 +149,7 @@ class StreamServer:
     def followVideo(self, userid, videoid):
         logger.info("user %d followed the owner of video %s" %(userid, videoid))
         db = lsdb.DB()
-        targetid = db.getVideoUser(videoid)
+        targetid = db.getVideoInfo(videoid)[5]
         if userid == targetid:
             logger.warning("invalid operation - %d follow himself" %userid)
             return False
@@ -163,7 +163,7 @@ class StreamServer:
     def unfollowVideo(self, userid, videoid):
         logger.info("user %d unfollowed the owner of video %s" %(userid, videoid))
         db = lsdb.DB()
-        targetid = db.getVideoUser(videoid)
+        targetid = db.getVideoInfo(videoid)[5]
         if targetid:
             return db.unfollowUser(userid, targetid)
 
@@ -200,6 +200,22 @@ class StreamServer:
         if nojson:
             return ret
         return json.dumps(ret, cls=TimeEncoder)
+
+    def getLikeVideo(self, userid, nojson=False):
+        logger.debug("return like list of user %d" %userid)
+        db = lsdb.DB()
+        fl = db.getLikeVideo(userid)
+        if nojson:
+            return fl
+        return json.dumps(fl, cls=TimeEncoder)
+
+    def getVideoInfo(self, videoid, nojson=False):
+        logger.debug("return video info for video %s" %videoid)
+        db = lsdb.DB()
+        vi = db.getVideoInfo(videoid)
+        if nojson:
+            return vi
+        return json.dumps(vi, cls=TimeEncoder)
 
     def getFeed(self, userid, nojson=False):
         logger.debug("return feed list of user %d" %userid)

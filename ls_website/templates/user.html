@@ -1,19 +1,31 @@
-{% include "header.html" %}
+{% extends "base.html" %}
+
+{% block pagebody %}
 {% if up %}
     <h4><img src="{{ up.3 }}" title="{{ up.2 }}" height="100" width="100"/>{{ up.2 }}</h4>
+    <div id="tag_follow">
     <ul>Type:<i>{{ up.5 }}</i>&emsp;SNS platform:<i>{{ up.4 }}</i>&emsp;Follower:<a href="{% url 'follower' up.0 %}">{{ up.6 }}</a>
-    &emsp;Following:<a href="{% url 'following' up.0 %}">{{ up.7 }}</a></ul>
+    &emsp;Following:<a href="{% url 'following' up.0 %}">{{ up.7 }}</a>&emsp;
+    {% if login_user and login_id %}
+      {% if login_user == up.2 %}
+        <p><a href="{% url 'addnew' up.0 %}">Add a new video with this user</a></p>
+      {% else %}
+        {% if followed %}
+          <button class="button" id="unfollow" type="button">unfollow</button>
+        {% else %}
+          <button class="button" id="follow" type="button">follow</button>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+    </ul></div>
 {% else %}
     <p>No user profile found.</p>
-{% endif %}
-{% if login_user == up.2 %}
-    <p><a href="{% url 'addnew' up.0 %}">Add a new video with this user</a></p>
 {% endif %}
 {% if user_videos %}
     <h4>Videos uploaded by <b>{{ up.2 }}</b></h4>
     <ul>
     {% for uv in user_videos %}
-        <a href="{{ MEDIA_URL }}{{ uv.0 }}">
+        <a href="{% url 'video' uv.0 %}">
         <img src="{{ MEDIA_URL }}{{ uv.0 }}/{{ uv.0 }}.jpeg" height="120" width="160" /></a>
         &emsp;Score:<b>{{ uv.3 }}</b>&emsp;Title:<i>{{ uv.1 }}</i>&emsp;Upload time:<i>{{ uv.4 }}</i></br>
     {% endfor %}
@@ -21,4 +33,20 @@
 {% else %}
     <p>{{ up.2 }} hasn't uploaded any videos yet.</p>
 {% endif %}
-{% include "footer.html" %}
+{% endblock %}
+
+{% block on_ready %}
+$.ajaxSetup({
+  data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+});
+$('#tag_follow').on("click", "#follow", function() {
+   $.post("{% url 'follow' %}", {uid:{{ login_id }}, targetid:{{ up.0 }}}, function(data,status){
+      $('#tag_follow').load(' #tag_follow')
+   });
+});
+$('#tag_follow').on("click", "#unfollow", function() {
+   $.post("{% url 'unfollow' %}", {uid:{{ login_id }}, targetid:{{ up.0 }}}, function(data,status){
+      $('#tag_follow').load(' #tag_follow')
+   });
+});
+{% endblock %}

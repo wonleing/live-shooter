@@ -24,13 +24,15 @@ drop table userlike;
 create table userlike(
 seq INTEGER PRIMARY KEY AUTOINCREMENT,
 userid int,
-videoid varchar(8));
+videoid varchar(8),
+UNIQUE (userid, videoid));
 
 drop table followship;
 create table followship(
 seq INTEGER PRIMARY KEY AUTOINCREMENT,
 userid int,
-following int);
+following int,
+UNIQUE (userid, following));
 
 drop table videocheck;
 create table videocheck(
