@@ -28,7 +28,7 @@ UNIQUE (userid, videoid));
 create table followship(
 seq int NOT NULL AUTO_INCREMENT primary key,
 userid int,
-following int
+following int,
 UNIQUE (userid, following));
 
 create table videocheck(
