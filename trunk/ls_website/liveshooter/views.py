@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.conf import settings
 from django.http import Http404, HttpResponse
 from liveshooter.models import Followship, Userlike, User, Uservideo, Video
@@ -8,14 +8,15 @@ import xmlrpclib, os, sina
 s=xmlrpclib.ServerProxy("%s:8000" %settings.XMLRPC_URL, encoding='latin-1')
 burl = 'http://54.248.182.51/'
 
-def genfn(request):
-    return HttpResponse(s.genFilename())
-
 def _check_login(request, context):
     if 'login_user' not in request.session:
         request.session['login_user'] = ""
     if 'login_id' not in request.session:
         request.session['login_id'] = ""
+    if 'access_token' not in request.session:
+        request.session['access_token'] = ""
+    if 'expires_in' not in request.session:
+        request.session['expires_in'] = ""
     context['login_user'] = request.session['login_user']
     context['login_id'] = str(request.session['login_id'])
 
@@ -57,6 +58,11 @@ def video(request, videoid):
         video_info = s.getVideoInfo(videoid, True)
     except:
         raise Http404
+    comments = None
+    if video_info[2]:
+        wb = sina.Weibo()
+        wb.setToken(request.session['access_token'], request.session['expires_in'])
+        comments = wb.getComment(video_info[2])
     for ext in [".mp4", ".flv", ".ogv", ".webm"]:
         if ext in str(os.listdir(settings.MEDIA_ROOT+videoid)):
             break
@@ -73,6 +79,10 @@ def video(request, videoid):
         'vi': video_info,
     }
     _check_login(request, context)
+    if video_info[2] and request.session['access_token']:
+        wb = sina.Weibo()
+        wb.setToken(request.session['access_token'], request.session['expires_in'])
+        context['comments'] = wb.getComment(video_info[2])
     context['liked'] = False
     if context['login_id']:
         login_id = int(context['login_id'])
@@ -116,34 +126,36 @@ def addnew(request, userid):
     return render(request, 'addnew.html', context)
 
 def doadd(request):
-    userid = int(request.POST.get('userid'))
-    videotitle = request.POST.get('videotitle').replace("'", "`").encode('utf-8')
-    ac = request.POST.get('account')
-    pw = request.POST.get('password')
-    try:
-        videopath = request.FILES['videopath']
-    except:
-        return HttpResponse('<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=user/%s"></head>Please choose a video</html>' %userid)
-    videoid = s.genFilename()
-    videoname = videoid + "." + videopath._get_name().split(".")[1]
-    os.system("mv %s /var/ftp/pub/%s;chmod 644 /var/ftp/pub/%s" %(videopath.temporary_file_path(), videoname, videoname))
-    if not s.addTitle(userid, videoid, videotitle):
-         return HttpResponse('<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=user/%s"></head>Add video title failed\n%s</html>' \
-         %(userid, str(userid)+","+videoid+","+videotitle))
-    url = s.finishUpload(videoid)
-    msg = videotitle + " " + burl + videoid
-    snapshot = burl + videoid + "/" + videoid + ".jpeg"
-    try:
+    if request.session['access_token'] and request.session['expires_in']:
+        userid = int(request.POST.get('userid'))
+        videotitle = request.POST.get('videotitle').replace("'", "`").encode('utf-8')
+        try:
+            videopath = request.FILES['videopath']
+        except:
+            return HttpResponse('<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=user/%s"></head>Please choose a video</html>' %userid)
+        videoid = s.genFilename()
+        videoname = videoid + "." + videopath._get_name().split(".")[1]
+        os.system("mv %s /var/ftp/pub/%s;chmod 644 /var/ftp/pub/%s" %(videopath.temporary_file_path(), videoname, videoname))
+        if not s.addTitle(userid, videoid, videotitle):
+             return HttpResponse('<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=user/%s"></head>Add video title failed\n%s</html>' \
+             %(userid, str(userid)+","+videoid+","+videotitle))
+        url = s.finishUpload(videoid)
+        msg = videotitle + " " + burl + videoid
+        snapshot = burl + videoid + "/" + videoid + ".jpeg"
+        snapshot = "http://liveshooter.cn.mu/static/pic/banner.jpg"
         wb = sina.Weibo()
-        if wb.auth(ac, pw):
-            wb.post(msg, snapshot)
+        wb.setToken(request.session['access_token'], request.session['expires_in'])
+        return HttpResponse(msg + "," + snapshot)
+        try:
+            ret = wb.post(msg, snapshot)
+            s.shareVideo(videoid, ret.mid)
             message = "</br>Video link posted on your weibo successfully"
-        else:
-            message = "</br>Failed to post on your weibo because of wrong account password"
-    except:
-        message = "</br>Failed to post on your weibo because of illegal words"
-    return HttpResponse('''<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=user/%s"></head>
-    Your video can be watched here: %s,%s</html>''' %(userid, url, message))
+        except:
+            message = "</br>Failed to post on your weibo because of illegal words or snapshot doesnot exist"
+        return HttpResponse('''<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=user/%s"></head>
+        Your video can be watched here: %s,%s</html>''' %(userid, url, message))
+    else:
+        return redirect('login')
 
 def login(request):
     context = {}
@@ -157,13 +169,17 @@ def dologin(request):
     site = request.POST.get('site')
     if site == 'sina':
         wb = sina.Weibo()
-        if wb.auth(ac, pw):
+        token = wb.auth(ac, pw)
+        if token:
+            wb.setToken(token[0], token[1])
             nickname, alink = wb.profile()
             logined = 1
     if logined:
         uid = s.loginUser(ac, site, nickname, alink)
         request.session['login_user'] = nickname
         request.session['login_id'] = uid
+        request.session['access_token'] = token[0]
+        request.session['expires_in'] = token[1]
         return HttpResponse('''<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=user/%s"></head>
         You have logined as %s</html>''' %(request.session['login_id'], request.session['login_user']))
     else:
@@ -172,6 +188,8 @@ def dologin(request):
 def logout(request):
     request.session['login_user'] = ""
     request.session['login_id'] = ""
+    request.session['access_token'] = ""
+    request.session['expires_in'] = ""
     return HttpResponse('''<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=/"></head>logout successfully!''')
 
 def follow(request):
@@ -180,7 +198,7 @@ def follow(request):
     if s.followUser(uid, targetid):
         return HttpResponse()
     else:
-        return HttpResponse(status=201)
+        return HttpResponse("fail to follow")
 
 def unfollow(request):
     uid = int(request.POST['uid'])
@@ -188,7 +206,7 @@ def unfollow(request):
     if s.unfollowUser(uid, targetid):
         return HttpResponse()
     else:
-        return HttpResponse(status=201)
+        return HttpResponse("fail to unfollow")
 
 def likevideo(request):
     uid = int(request.POST['uid'])
@@ -196,7 +214,7 @@ def likevideo(request):
     if s.likeVideo(uid, videoid):
         return HttpResponse()
     else:
-        return HttpResponse(status=201)
+        return HttpResponse("fail to like video")
 
 def unlikevideo(request):
     uid = int(request.POST['uid'])
@@ -204,5 +222,17 @@ def unlikevideo(request):
     if s.unlikeVideo(uid, videoid):
         return HttpResponse()
     else:
-        return HttpResponse(status=201)
+        return HttpResponse("fail to unlike video")
 
+def addcomment(request):
+    nc = request.POST['msg'][:140]
+    mid = request.POST['mid']
+    if request.session['access_token'] and nc and mid:
+        wb = sina.Weibo()
+        wb.setToken(request.session['access_token'], request.session['expires_in'])
+        try:
+            wb.addComment(nc, mid)
+            return HttpResponse()
+        except:
+            pass
+    return HttpResponse("Fail to add comment. Make sure thread exist and message legal.")

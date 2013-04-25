@@ -6,13 +6,10 @@
         {% csrf_token %}
         <label>Video description:</label>&emsp;<input type="text" name="videotitle" size=100 /></br>
         <label>Choose your Video:</label>&emsp;<input type="file" name="videopath" /></br>
-        <label>Weibo account:</label>&emsp;<input type="text" name="account" size=30 /></br>
-        <label>Password:</label>&emsp;<input type="password" name="password" size=30 /></br>
         <input type="hidden" name="userid" value="{{ uid }}" />
         <p><input type="submit" value="Upload" /></p>
     </form>
 {% else %}
-    <p>{{login_id}},{{uid}}</p>
-    <p>Please login before adding new video.</p>
+    <p>Please upload video in your own page.</p>
 {% endifequal %}
 {% endblock %}

@@ -29,6 +29,16 @@
     {% endif %}
   {% endif %}
   </div>
+  <br/>
+  {% if comments %}
+    <h4>Comments from Weibo:</h4>
+    {% for c in comments.comments %}
+      <img src="{{ c.user.profile_image_url }}" height="24" width="24" />{{ c.user.screen_name }}:&nbsp;{{ c.text }}<br/>
+    {% endfor %}
+    <h4>Post a new comment:</h4>
+      <textarea cols="60" rows="8" id="newcomment" class="textarea"></textarea><br/>
+      <button id="submitcomment" class="button">Post</button>
+  {% endif %}
 </div>
 {% endblock %}
 
@@ -44,6 +54,15 @@ $('#tag_like').on('click','#like',function(){
 $('#tag_like').on('click','#unlike',function(){
    $.post("{% url 'unlikevideo' %}", {uid:{{ login_id }}, videoid:"{{ videoid }}"}, function(data,status){
       $('#tag_like').load(' #tag_like')
+   });
+});
+$('#submitcomment').click(function(){
+   $.post("{% url 'addcomment' %}", {msg:$('#newcomment').val(), mid:"{{ vi.2 }}"}, function(data,status){
+     if (data=="") {
+          location.reload()
+       } else {
+          alert(data)
+     }
    });
 });
 {% endblock %}

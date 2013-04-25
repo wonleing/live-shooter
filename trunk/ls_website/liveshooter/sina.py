@@ -20,10 +20,12 @@ class Weibo:
         self.conn.close()
         if location:
             r = self.client.request_access_token(location.split('=')[1])
-            self.client.set_access_token(r.access_token, r.expires_in)
-            return True
+            return (r.access_token, r.expires_in)
         else:
-            return False
+            return None
+
+    def setToken(self, access_token, expires_in):
+        self.client.set_access_token(access_token, expires_in)
 
     def post(self, text, image):
         self.client.statuses.upload.post(status=text, pic=urllib.urlopen(image))
@@ -31,3 +33,9 @@ class Weibo:
     def profile(self):
         u = self.client.get.statuses__user_timeline().statuses[0].user
         return(u.screen_name, u.avatar_large)
+
+    def getComment(self, mid):
+        return self.client.comments.show.get(id=int(mid))
+
+    def addComment(self, newcomment, mid):
+        self.client.comments.create.post(comment=newcomment, id=int(mid))
