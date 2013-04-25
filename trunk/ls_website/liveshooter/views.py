@@ -142,10 +142,8 @@ def doadd(request):
         url = s.finishUpload(videoid)
         msg = videotitle + " " + burl + videoid
         snapshot = burl + videoid + "/" + videoid + ".jpeg"
-        snapshot = "http://liveshooter.cn.mu/static/pic/banner.jpg"
         wb = sina.Weibo()
         wb.setToken(request.session['access_token'], request.session['expires_in'])
-        return HttpResponse(msg + "," + snapshot)
         try:
             ret = wb.post(msg, snapshot)
             s.shareVideo(videoid, ret.mid)

@@ -47,7 +47,7 @@ class VideocheckAdmin(admin.ModelAdmin):
             Userlike.objects.filter(videoid=obj.videoid).delete()
         except:
             pass
-        os.system("rm -rf %s%s" %(settings.MEDIA_ROOT, obj.videoid))
+        os.system("sudo rm -rf %s%s" %(settings.MEDIA_ROOT, obj.videoid))
     def play_link(self, obj):
         short_description = 'Play it now'
         return '<a href="%s%s" target="_blank">play now</a>' % (settings.MEDIA_URL, obj.videoid)
