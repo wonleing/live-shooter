@@ -16,7 +16,7 @@ def _check_login(request, context):
     if 'access_token' not in request.session:
         request.session['access_token'] = ""
     if 'expires_in' not in request.session:
-        request.session['expires_in'] = ""
+        request.session['expires_in'] = 0
     context['login_user'] = request.session['login_user']
     context['login_id'] = str(request.session['login_id'])
 
@@ -59,7 +59,7 @@ def video(request, videoid):
     except:
         raise Http404
     comments = None
-    if video_info[2]:
+    if video_info[2] and request.session['access_token']:
         wb = sina.Weibo()
         wb.setToken(request.session['access_token'], request.session['expires_in'])
         comments = wb.getComment(video_info[2])
@@ -187,7 +187,7 @@ def logout(request):
     request.session['login_user'] = ""
     request.session['login_id'] = ""
     request.session['access_token'] = ""
-    request.session['expires_in'] = ""
+    request.session['expires_in'] = 0
     return HttpResponse('''<html><head><META HTTP-EQUIV="refresh" CONTENT="3;URL=/"></head>logout successfully!''')
 
 def follow(request):
