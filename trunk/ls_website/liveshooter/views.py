@@ -59,10 +59,6 @@ def video(request, videoid):
     except:
         raise Http404
     comments = None
-    if video_info[2] and request.session['access_token']:
-        wb = sina.Weibo()
-        wb.setToken(request.session['access_token'], request.session['expires_in'])
-        comments = wb.getComment(video_info[2])
     for ext in [".mp4", ".flv", ".ogv", ".webm"]:
         if ext in str(os.listdir(settings.MEDIA_ROOT+videoid)):
             break

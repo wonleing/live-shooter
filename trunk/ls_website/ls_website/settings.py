@@ -1,26 +1,24 @@
 # Django settings for ls_website project.
 
-DEBUG = True #False
+DEBUG = True 
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    ('Leon', 'wonleing@gmail.com'),
+    #('Leon', 'wonleing@gmail.com'),
 )
 
 MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'read_default_file': '/etc/mysql/my.cnf',
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '/home/leon/streamserver/liveshooter.db',
     }
 }
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en//ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ['0.0.0.0','54.248.182.51', 'liveshooter.cn.mu']
+ALLOWED_HOSTS = ['0.0.0.0','localhost', '192.168.188.2', '127.0.0.1', '54.248.182.51', 'liveshooter.cn.mu']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -52,8 +50,9 @@ MEDIA_ROOT = '/var/www/'
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://example.com/media/", "http://media.example.com/"
-MEDIA_URL = 'http://liveshooter.cn.mu/'
-XMLRPC_URL = 'http://10.146.27.163'
+MEDIA_URL = 'http://localhost/'
+XMLRPC_URL = 'http://127.0.0.1'
+#XMLRPC_URL = 'http://192.168.188.2'
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -63,8 +62,10 @@ STATIC_ROOT = '/var/www/static'
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
-STATIC_URL = 'http://liveshooter.cn.mu/static/'
-ADMIN_MEDIA_PREFIX = 'http://liveshooter.cn.mu/static/admin/'
+STATIC_URL = 'http://127.0.0.1/static/'
+#STATIC_URL = 'http://192.168.188.2/static/'
+ADMIN_MEDIA_PREFIX = 'http://127.0.0.1/static/admin/'
+#ADMIN_MEDIA_PREFIX = 'http://192.168.188.2/static/admin/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -107,7 +108,7 @@ ROOT_URLCONF = 'ls_website.urls'
 WSGI_APPLICATION = 'ls_website.wsgi.application'
 
 TEMPLATE_DIRS = (
-    "/home/ubuntu/ls_website/templates"
+    "/home/leon/ls_website/templates"
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
