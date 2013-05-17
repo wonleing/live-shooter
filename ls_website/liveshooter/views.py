@@ -30,6 +30,7 @@ def index(request):
     _check_login(request, context)
     if context['login_id']:
         login_id = int(context['login_id'])
+        context['sns_friends'] = s.getSNSfollowing(login_id, True)
         context['follow_users'] = s.getFollowing(login_id, True)
         context['feed_videos'] = s.getFeed(login_id, True)
     return render(request, 'index.html', context)
@@ -162,6 +163,8 @@ def dologin(request):
     pw = request.POST.get('password')
     site = request.POST.get('site')
     if site == 'sina':
+        if '@' not in ac:
+            ac += '@sina.com'
         wb = sina.Weibo()
         token = wb.auth(ac, pw)
         if token:

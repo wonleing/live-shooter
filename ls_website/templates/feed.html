@@ -1,3 +1,14 @@
+{% if sns_friends %}
+    <h4>Your SNS friends in our site</h4>
+    {% for sf in sns_friends %}
+        <a href="{% url 'user' sf.0 %}">
+        <img src="{{ sf.3 }}" title="{{ sf.2 }}" height="42" width="42"/>{{ sf.2 }}</a></br>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>You don't have any sns friends in our site yet. Invite them to join us!</p>
+{% endif %}
+
 {% if follow_users %}
     <h4>Followed users</h4>
     <ul>
