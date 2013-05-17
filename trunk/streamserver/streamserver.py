@@ -245,14 +245,17 @@ class StreamServer:
             return ret
         return json.dumps(ret, cls=TimeEncoder)
 
-    def getSNSfollowing(self, screen_name, usns, nojson=False):
-        users = json.load(urllib2.urlopen(sina_friend_url %screen_name))['users']
+    def getSNSfollowing(self, userid, nojson=False):
         db = lsdb.DB()
+        profile = db.getUserProfile(userid)
+        u_nickname = profile[2]
+        u_sns = profile[4]
+        users = json.load(urllib2.urlopen(sina_friend_url %u_nickname))['users']
         ret = []
         for u in users:
-            profile = db.selectUserByNickname(u['screen_name'], usns)
+            profile = db.selectUserByNickname(u['screen_name'], u_sns)
             if profile:
-                logger.debug("found user %d for %s's friends at %s" %(profile[0], screen_name, usns))
+                logger.debug("found user %d for %s's friends at %s" %(profile[0], u_nickname, u_sns))
                 ret.append(profile)
         if nojson:
             return ret
