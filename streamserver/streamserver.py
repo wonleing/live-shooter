@@ -32,7 +32,7 @@ formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
 logger.setLevel(logging.INFO)
-sina_friend_url = 'https://api.weibo.com/2/friendships/friends.json?screen_name=%s&access_token=2.00taLJZBUj6VFBef805927ebBSuBKE'
+sina_friend_url = 'https://api.weibo.com/2/friendships/friends.json?screen_name=%s&access_token=2.003voBJC0Tr7wy7ece7b0eb5_RgKYD'
 
 class TimeEncoder(json.JSONEncoder):
     def default(self, obj):
