@@ -7,6 +7,7 @@ class DB:
             DB_type == 'mysql'
             import MySQLdb
             self.cx = MySQLdb.connect('localhost', 'live', 'shooter@123', 'liveshooter')
+            self.cx.set_character_set('utf8')
         except:
             import sqlite3
             self.cx = sqlite3.connect("./liveshooter.db")
