@@ -5,7 +5,7 @@ from django.http import Http404, HttpResponse
 from liveshooter.models import Followship, Userlike, User, Uservideo, Video
 from ftplib import FTP
 import xmlrpclib, os, sina
-s=xmlrpclib.ServerProxy("%s:8000" %settings.XMLRPC_URL, encoding='latin-1')
+s=xmlrpclib.ServerProxy("%s:8000" %settings.XMLRPC_URL, encoding='utf-8')
 burl = 'http://54.248.182.51/'
 
 def _check_login(request, context):
