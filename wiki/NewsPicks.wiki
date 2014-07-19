@@ -1,0 +1,5 @@
+= Mile Stone 1 =
+
+||*Content*||*Owner*||*Start time*||*Finish time*||*Status*||
+||initial project pages，wiki, design doc，source code version control||Wonleing||2014/7/19||2014/7/19||Done||
+||IOS clients development organizing||Leon||2012/7/19|| ||on going||
