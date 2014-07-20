@@ -32,12 +32,13 @@
 * Duquanlong
   # learning oauth
 
+= NewsPicks =
 == 2014.07.20 ==
 
 * 要求：
-  # 1. 项目进度每周check
-  # 2. 项目工作进度及时更新到https://code.google.com/p/live-shooter/wiki/NewsPicks
-  # 3. 代码及时checkin到github，方便及时测试最新代码
+  # 项目进度每周check
+  # 项目工作进度及时更新到https://code.google.com/p/live-shooter/wiki/NewsPicks
+  # 代码及时checkin到github，方便及时测试最新代码
 
 * action list:
   # 李昂尽快整理出需求字段
