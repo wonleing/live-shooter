@@ -31,3 +31,19 @@
 
 * Duquanlong
   # learning oauth
+
+== 2014.07.20 ==
+
+* 要求：
+  # 1. 项目进度每周check
+  # 2. 项目工作进度及时更新到https://code.google.com/p/live-shooter/wiki/NewsPicks
+  # 3. 代码及时checkin到github，方便及时测试最新代码
+
+* action list:
+  # 李昂尽快整理出需求字段
+  # 李昂发给王麟客户端详细模块工作计划(road map)
+  # 李昂让所有开发兄弟申请github的checkin权限
+  # 接下来王麟完成服务器api的设计与实施，搭在外网服务器上以供调用与测试
+
+* reference:
+  # https://developers.facebook.com/docs/reference/dialogs/oauth/
