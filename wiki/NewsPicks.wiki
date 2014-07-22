@@ -2,4 +2,14 @@
 
 ||*Content*||*Owner*||*Start time*||*Finish time*||*Status*||
 ||initial project pages，wiki, design doc，source code version control||Wonleing||2014/7/19||2014/7/19||Done||
-||IOS clients development organizing||Leon||2012/7/19|| ||on going||
+||IOS universal code branch initial||Leon||2014/7/20||2014/7/21||Done||
+||IOS clients development road map||Leon||2014/7/22||2014/7/22||Done||
+||研究及开发特效||Leon||2014/7/22||2014/8/6||On going||
+||API需求制定||Leon||2014/7/22||2014/7/29||On going||
+||服务器API开发及搭建||Wonleing|| || ||Pending||
+||API调用对接|| || || ||Pending||
+||界面布局|| || || ||Pending||
+||分享功能|| || || ||Pending||
+||设置功能|| || || ||Pending||
+||校对界面整合及效果|| || || ||Pending||
+||test and bug fix|| || || ||Pending||
