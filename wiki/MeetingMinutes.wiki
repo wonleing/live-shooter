@@ -48,3 +48,15 @@
 
 * reference:
   # https://developers.facebook.com/docs/reference/dialogs/oauth/
+
+== 2014.07.27 ==
+* progress
+  # server api 已经基本完成，服务器上线完成，文档也已完成
+  # 效果研究中（Leon)
+  # 界面构架基本完成（大鱼）
+
+* action list:
+  # 大数据尽量采用post的方式
+  # Leon/大鱼尽快开始API调用测试，有问题反馈
+  # 下周界面要初步效果和使用感
+  # checkin最新代码，下周末实现安装首个测试demo
