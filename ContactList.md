@@ -1,0 +1,18 @@
+# How to connect us #
+## Contact list ##
+
+|**Name**|**Mobile**|**Google account**|**Mail**|**QQ**|
+|:-------|:---------|:-----------------|:-------|:-----|
+|Leon|13810776712|wonleing@gmail.com|wonleing@163.com|26240726|
+|Arashmen|18600545192|arashmenzhu@gmail.com|arashmen@163.com|173764546|
+|Chen Jianping|13426305521|jpchen29@gmail.com|jpchen29@gmail.com|624751948|
+|Jia  Yonghua |13386167146|jiayonghua1988@gmail.com|yonghua.jia@yek.me|1048922801|
+|Yu Zhongyang|18611261160|dh06128703@gamil.com|dh06128703@163.com|349612334|
+
+## project mail list ##
+
+live-shooter@googlegroups.com
+
+## IM group (for online meeting) ##
+
+QQ group: 259869691

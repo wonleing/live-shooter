@@ -1,0 +1,19 @@
+# Mile Stone 1 #
+
+|**Content**|**Owner**|**Start time**|**Finish time**|**Status**|
+|:----------|:--------|:-------------|:--------------|:---------|
+|initial project pages，wiki, design doc，source code version control|Wonleing|2014/7/19|2014/7/19|Done|
+|IOS universal code branch initial|Leon|2014/7/20|2014/7/21|Done|
+|IOS clients development road map|Leon|2014/7/22|2014/7/22|Done|
+|研究及开发特效|Leon|2014/7/22|2014/8/10|Done|
+|API需求制定|Leon/大鱼|2014/7/22|2014/7/26|Done|
+|服务器API开发及搭建|Wonleing|2014/7/20|2014/7/27|Done|
+|API调用对接|红羽/Wonleing|2014/7/27|2014/8/10|Done|
+|界面布局|大鱼／红羽|2014/7/20|2014/8/10|Done|
+|分享功能|红羽|2014/8/10|2014/8/20|Done|
+|设置功能|红羽|2014/8/10|2014/8/20|Done|
+|校对界面整合及效果|红羽/Leon|2014/8/3|2014/8/10|Done|
+|test and bug fix|All|2014/8/20|2014/9/2|Done|
+
+## API doc: ##
+https://docs.google.com/document/d/1Q7AwyhdSALGTVQjpF1iZy6KrF_KqBlkC7fl02KADYL8

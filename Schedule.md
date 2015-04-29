@@ -1,0 +1,67 @@
+# Mile Stone 1 #
+
+|**Content**|**Owner**|**Start time**|**Finish time**|**Status**|
+|:----------|:--------|:-------------|:--------------|:---------|
+|initial project pages，wiki, design doc，source code version control|Leon|2012/3/29|2012/3/29|Done|
+|Android app initialize|Arashmen|2012/4/9|2012/4/11|Done|
+|Oauth module import|Arashmen|2012/4/12|2012/4/15|Done|
+|Video record and save to local disk |Arashmen|2012/4/16|2012/4/18|Done|
+|Http live streaming research in android client|Arashmen|2012/4/19|2012/4/22 |Done|
+|Split video into clips real time|Arashmen|2012/4/22|2012/5/7  |Done|
+|Video clips upload to server demo|Arashmen|2012/5/15|2012/5/20  |Done|
+|Integrate modules and make the app run|Arashmen|2012/6/11|2012/6/15 |Done|
+|Upload video via ftp stream|Arashmen|2012/5/20|2012/6/20|Done|
+|Helix server and producer setup trail|Leon|2012/4/16|2012/4/19|Done|
+|Http live streaming docs research|Leon|2012/4/17|2012/4/20|Done|
+|Make use of VLC (open source) codec covertion|Leon|2012/4/17|2012/4/20|Done|
+|Linux stream server initialize|Leon|2012/4/17|2012/5/4|Done|
+|Design and try c/s xmlrpc protocol|Leon|2012/5/2|2012/5/13|Done|
+|Basic XMLRPC server apis|Leon|2012/5/13|2012/6/2|Done|
+|Setup test server to integration test with server api and java client|Leon|2012/5/2|2012/6/2|Done|
+|SIP solution research|Leon|2012/5/30|2012/6/16|Done|
+|updateSegment and finishRecord apis|Leon|2012/6/16|2012/6/18|Done|
+|socket multiple thread server, multiple thread client samples|Leon|2012/8/20|2012/8/31|Done|
+|vlc stream video to http live streaming, implement with xmlrpc apis|Leon|2012/8/31|2012/9/19|Done|
+|debug client stream video(h264 problem) and fit server xmlrpc api|Leon/JP|2012/9/19|2012/11/1|Done|
+|Send video stream by RDP packet and User interface inhancement|JP|2012/11/1|2012/12/30|Done|
+|Map UDP packet to UDP broadcast stream for better performance|Leon|2012/11/1|  |Postponed|
+|Sound integration problem|JP|2012/11/1|  |Postponed|
+|Video rotation problem|JP|2012/11/1|  |Postponed|
+|Optimize the client logic to lower the lag|Leon/JP|2012/11/1|  |Postponed|
+|Post video link to SNS and retrieve comments back|  |  |  |Postponed|
+|Write docs about server setup and debug env|  |  |  |Postponed|
+
+
+# Mile Stone 2 #
+
+|**Content**|**Start time**|**Finish time**|**Owner**|**Status**|
+|:----------|:-------------|:--------------|:--------|:---------|
+|Product design docs|2012/12/30|2013/1/2|Leon|Done|
+|Review feed back the doc and make schedule|2013/1/3|2013/1/6|Arashmen & JP|Done|
+|Re-construct server api and database according to new design|2013/1/5|2013/1/8|Leon|Done|
+|Design and write server API doc|2013/1/5|2013/1/8|Leon|Done|
+|server API unit test script|2013/1/8|2013/1/8|Leon|Done|
+|Debug and setup test server|2013/1/8|2013/1/9|Leon|Done|
+|add nickname and photo|2013/1/10|2013/1/20|Leon|Done|
+|return json instead of python list|2013/1/10|2013/1/20|Leon|Done|
+|api: follow, unfollow,(via uid and vid) like, unlike, user\_profile|2013/1/10|2013/1/20|Leon|Done|
+|snap video first pic|2013/1/19|2013/1/21|Leon|Done|
+|add recommand user/video, change user type, delete video apis|2013/1/21|2013/1/23|Leon|Done|
+|sort returned video list, define user types and admin works|2013/1/21|2013/1/23|Leon|Done|
+|develop website, admin site|2013/1/24|2013/2/2|Leon|Done|
+|Implement website, adminsite on public server with new API, update API doc|2013/1/24|2013/2/2|Leon|Done|
+|Upgrade public server with django 1.5, public website, video tutorials |2013/2/3|2013/2/23|Leon|Done|
+|message(via user and video) module design and implement|  |  |  |Wait|
+|_ios_ Sina Mini Blog Login|2013/1/5|2013/1/7|Arashmen|Done|
+|_ios_ Record Video |2013/1/8|2013/1/13|Arashmen|Done|
+|_ios_ Upload Video|2013/1/14|2013/1/16|Arashmen|In progress|
+|_ios_ Debug With Server |2013/1/17|2013/1/19|Arashmen|In progress|
+|_Android_ login screen|2013/1/7|2013/1/8|JP|Done|
+|_Android_ recording screen|2013/1/9|2013/1/12|JP|Done|
+|_Android_ feed screen|2013/1/21|2013/1/26|JP|Done|
+|_Android_ uploading screen|2013/1/13|2013/1/17|JP|In progress|
+|_Android_ play back screen|2013/1/18|2013/1/20|JP|In progress|
+|_Android_ share screen|2013/1/19|  |JP|In progress|
+|_Android_ top video, friend and recommandation page|2013/1/19|  |JP|In progress|
+|_Android_ .mp4, audio, sns login, sns publish, comment|2013/1/19|  |JP|In progress|
+|_Android_ video comment, share, flash and landscape record|  |  |JP|Wait|

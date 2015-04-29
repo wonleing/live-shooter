@@ -1,0 +1,16 @@
+# 关于工作方式及报酬 #
+
+
+
+工作方法：以远程工作为主，类似于开源社区式开发小组，通过wiki schedule来分发工作内容，跟踪工作进度，以邮件及IM为主要交流方式。
+
+工作时间：固定的weekly online meeting时间，及不固定的线下meeting。
+
+工作流程：可根据自己时间及能力在schedule上选择自己的工作内容（模块），提交设计文档、review之后编码并测试。
+
+工作报酬：以多劳多得原则为主，根据模块的完成质量及时间支持报酬。
+
+
+如果你感兴趣请给我(wonleing@163.com)或我们的mail list(live-shooter@googlegroups.com)发邮件确认，之后我会帮你处理一些关于项目的svn, wiki, schedule，邮件列表，IM群，开发环境搭建等问题。
+
+- Leon
